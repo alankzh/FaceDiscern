@@ -6,3 +6,5 @@ a face discern base on ArcFace dll
   IDE:Qtcreator 5.6.4
   编译器：msvc2013
 主体功能2018年2月26号~2018年3月11号开发完成。
+
+注意将ArcFaceLibrary中的动态库加入.exe的运行时目录
