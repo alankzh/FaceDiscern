@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>ResourcesPackage/background.png</file>
+        <file>ResourcesPackage/CISDILogo.png</file>
+        <file>ResourcesPackage/CodingtechLogo.png</file>
+        <file>ResourcesPackage/faceIsEmployee.png</file>
+        <file>ResourcesPackage/faceIsVisitor.png</file>
+        <file>ResourcesPackage/runningLabel.png</file>
+        <file>ResourcesPackage/background.jpg</file>
+    </qresource>
+</RCC>
