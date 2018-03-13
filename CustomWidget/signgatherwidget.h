@@ -5,6 +5,7 @@
 #include <QtGui>
 #include "CustomWidget/signinwidget.h"
 #include "CustomWidget/terransigninmessagewidget.h"
+#include "httputil.h"
 
 /**
  * @brief The SignGatherWidget class
@@ -15,6 +16,7 @@ class SignGatherWidget:public QWidget
     Q_OBJECT
 public:
     SignGatherWidget(QWidget *parent=nullptr);
+    ~SignGatherWidget();
     const int width=730;
     const int height=721;//spaceΪ5
     enum AnimatorStatus{

@@ -58,8 +58,11 @@ void CustomCameraViewFinder::paintEvent(QPaintEvent *event){
             //            font.setFamily(QString::fromLocal8Bit("Microsoft YaHei UI"));
             font.setFamily(QString::fromLocal8Bit("黑体"));
             font.setPixelSize(fontSize);
-
+            font.setWeight(75);
             painter.setFont(font);
+            QPen fontPen;
+            fontPen.setColor(fontColor);
+            fontPen.setWidth(4);
             painter.setPen(fontColor);
             if(appearFontCount >= (terran.name.size())){
                 painter.drawText(QRect(left,top+height*0.35,width,fontSize+1),Qt::AlignLeft,terran.name);//第一行字 姓名

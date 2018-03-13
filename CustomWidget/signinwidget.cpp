@@ -5,14 +5,9 @@ SignInWidget::SignInWidget(QWidget *parent):QWidget(parent){
 }
 
 SignInWidget::~SignInWidget(){
-    if(httpUtil!=nullptr){
-        delete httpUtil;
-        httpUtil=nullptr;
-    }
 }
 
 void SignInWidget::init(){
-    httpUtil=new HttpUtil();
 
     resize(width,height);
     setFixedSize(width,height);
@@ -48,23 +43,5 @@ void SignInWidget::insertTerranInformation(Terran terran, TerranSignInMessageWid
     qDebug()<<terran.department;
     messageWidget->loadData(image,terran.name,terran.department,labelType);
     timeWidget->setTimeAndDate();
-
-    QString url=SEND_SIGN_IN_MESSAGE_URL;
-    url.append(QString::fromLocal8Bit("&Name="));
-    url.append(terran.name);
-
-    url.append(QString::fromLocal8Bit("&UserId="));
-    url.append(QString::number(terran.id));
-
-    url.append(QString::fromLocal8Bit("&Type="));
-    url.append(QString::fromLocal8Bit("true"));
-
-    url.append(QString::fromLocal8Bit("&Department="));
-    url.append(QString::number(terran.departmentId));
-
-    url.append(QString::fromLocal8Bit("&Work="));
-    url.append(QString::fromLocal8Bit("true"));
-
-    httpUtil->sendMessage(url.toUtf8());
 }
 

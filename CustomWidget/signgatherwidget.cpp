@@ -4,6 +4,9 @@ SignGatherWidget::SignGatherWidget(QWidget *parent):QWidget(parent){
     init();
 }
 
+SignGatherWidget::~SignGatherWidget(){
+}
+
 void SignGatherWidget::init(){
     resize(width,height);
     setFixedSize(width,height);
@@ -32,6 +35,7 @@ void SignGatherWidget::init(){
     widgetList.append(signInWidget1);
 
     connect(this,SIGNAL(animatorEnd()),this,SLOT(onMovingEnd()));
+
 }
 
 void SignGatherWidget::paintEvent(QPaintEvent *event){
@@ -41,17 +45,17 @@ void SignGatherWidget::paintEvent(QPaintEvent *event){
 }
 
 void SignGatherWidget::terranSignIn(Terran terran, TerranSignInMessageWidget::LabelType labelType){
-    if(status==AnimatorStatus::End){
-        SignInWidget *signInWidgetNew=new SignInWidget(this);
-        signInWidgetNew->insertTerranInformation(terran,labelType);
-        signInWidgetNew->move(0,0);
-        signInWidgetNew->setWindowOpacity(0);//Í¸Ã÷
-        signInWidgetNew->hide();
-        widgetList.append(signInWidgetNew);
-        startSignInAnimator();
-    }else{
-        needAnimatorList.append(terran);
-    }
+        if(status==AnimatorStatus::End){
+            SignInWidget *signInWidgetNew=new SignInWidget(this);
+            signInWidgetNew->insertTerranInformation(terran,labelType);
+            signInWidgetNew->move(0,0);
+            signInWidgetNew->setWindowOpacity(0);//Í¸Ã÷
+            signInWidgetNew->hide();
+            widgetList.append(signInWidgetNew);
+            startSignInAnimator();
+        }else{
+            needAnimatorList.append(terran);
+        }
 }
 
 void SignGatherWidget::signIn(Terran terran){
@@ -119,4 +123,5 @@ void SignGatherWidget::onMovingEnd(){
         startSignInAnimator();
     }
 }
+
 

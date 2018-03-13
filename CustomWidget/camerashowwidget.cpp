@@ -4,6 +4,13 @@ CameraShowWidget::CameraShowWidget(QWidget *parent):QWidget(parent){
     init();
 }
 
+CameraShowWidget::~CameraShowWidget(){
+    if(httpUtil!=nullptr){
+        delete httpUtil;
+        httpUtil=nullptr;
+    }
+}
+
 void CameraShowWidget::init(){
     resize(width,height);
     setFixedSize(width,height);
@@ -26,6 +33,12 @@ void CameraShowWidget::init(){
 
     mainLayout->addWidget(customViewFinder);
     this->setLayout(mainLayout);
+
+    httpUtil=new HttpUtil();
+    qtimer=new QTimer(this);
+    qtimer->setInterval(60000);//60s钟清空一次签到
+    connect(qtimer,SIGNAL(timeout()),this,SLOT(clearSignedTerran()));
+    qtimer->start();
 }
 
 
@@ -87,13 +100,7 @@ void CameraShowWidget::onTerranEnter(QList<Terran> listFromEngine){
 
     //人脸矩形出现
     if(insertList.size()>0){
-        for(Terran terran:insertList){
-            qDebug()<<"insert";
-            if(terran.id>0){
-             emit newTerranSign(terran);
-            }
-            customViewFinder->addTerranRect(terran);//出现时自动开始动画
-        }
+        insertTerran(insertList);
     }
 
     //删除人脸矩形
@@ -125,4 +132,61 @@ void CameraShowWidget::receiveCapturedImage(int, QImage image){
 void CameraShowWidget::captureImageFromCamera(){
     qDebug()<<"CameraShowWidget::captureImageFromCamera";
     cameraImageCapture->capture();
+}
+
+/**
+ * @brief CameraShowWidget::insertTerran
+ * 人脸矩形出现的处理
+ * @param insertList
+ */
+void CameraShowWidget::insertTerran(QList<Terran> &insertList){
+    bool hasSigned=false;
+    for(Terran terran:insertList){
+        qDebug()<<"insert";
+
+        if(terran.id>0){
+            hasSigned=false;
+            for(Terran signedTerran:signedList){
+                if(signedTerran.id==terran.id){
+                    hasSigned=true;
+                    break;
+                }
+            }
+            if(!hasSigned){
+                signedList.append(terran);
+                /*向展示性控件通知有新人签到*/
+                emit newTerranSign(terran);
+
+                /*向服务器发送签到消息*/
+                QString url=SEND_SIGN_IN_MESSAGE_URL;
+                url.append(QString::fromLocal8Bit("&Name="));
+                url.append(terran.name);
+
+                url.append(QString::fromLocal8Bit("&UserId="));
+                url.append(QString::number(terran.id));
+
+                url.append(QString::fromLocal8Bit("&Type="));
+                url.append(QString::fromLocal8Bit("true"));
+
+                url.append(QString::fromLocal8Bit("&Department="));
+                url.append(QString::number(terran.departmentId));
+
+                url.append(QString::fromLocal8Bit("&Work="));
+                url.append(QString::fromLocal8Bit("true"));
+
+                httpUtil->sendMessage(url.toUtf8());
+            }
+        }
+
+        customViewFinder->addTerranRect(terran);//出现时自动开始动画
+    }
+}
+
+/**
+ * @brief CameraShowWidget::clearSignedTerran
+ * 清空已签到缓存
+ */
+void CameraShowWidget::clearSignedTerran(){
+    signedList.clear();
+    signedList={};
 }

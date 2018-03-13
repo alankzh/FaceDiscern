@@ -70,8 +70,8 @@ void FaceDiscernThreadHelper::receiveCaptureImage(QImage image){
     QImage scaledImage = image.scaled(QSize(1140,845),
                                       Qt::IgnoreAspectRatio,
                                       Qt::SmoothTransformation);
-//  TODO  scaledImage.save("E:\\sava.jpg");
-//    qDebug()<<scaledImage.size();
+    //  TODO  scaledImage.save("E:\\sava.jpg");
+    //    qDebug()<<scaledImage.size();
     int errorCode=0;
     LPAFT_FSDK_FACERES ftFaceRes=faceDiscern->FTEngineDiscern(scaledImage,errorCode);
     if(errorCode!=MOK){
@@ -108,7 +108,7 @@ void FaceDiscernThreadHelper::receiveCaptureImage(QImage image){
                         qDebug()<<terran2.name;
                         qDebug()<<"frInput, left:"<<frInput.rcFace.left<<"right:"<<frInput.rcFace.right<<"top:"<<frInput.rcFace.top<<"bottom:"<<frInput.rcFace.bottom;
                         terran2.frFaceInput=frInput;//加上人脸矩形
-                         qDebug()<<"terran2, left:"<<terran2.frFaceInput.rcFace.left<<"right:"<<terran2.frFaceInput.rcFace.right<<"top:"<<terran2.frFaceInput.rcFace.top<<"bottom:"<<terran2.frFaceInput.rcFace.bottom;
+                        qDebug()<<"terran2, left:"<<terran2.frFaceInput.rcFace.left<<"right:"<<terran2.frFaceInput.rcFace.right<<"top:"<<terran2.frFaceInput.rcFace.top<<"bottom:"<<terran2.frFaceInput.rcFace.bottom;
                         selectList.append(terran2);
                         isEmployee=true;
                         break;
@@ -140,7 +140,7 @@ void FaceDiscernThreadHelper::receiveCaptureImage(QImage image){
                             break;
                         }else{
                             QImage faceImg=image.copy(ftFaceRes->rcFace[i].left,ftFaceRes->rcFace[i].top,ftFaceRes->rcFace[i].right-ftFaceRes->rcFace[i].left,ftFaceRes->rcFace[i].bottom-ftFaceRes->rcFace[i].top);
-//    TODO                        faceImg.save("E:\\visitornew.jpg");
+                            //    TODO                        faceImg.save("E:\\visitornew.jpg");
                         }
                     }
                 }
@@ -164,7 +164,7 @@ void FaceDiscernThreadHelper::receiveCaptureImage(QImage image){
         visitorFeatureList.clear();
         visitorFeatureList=selectVisitorFeatureList;
 
-////        SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDBWithId,selectList);
+        ////        SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDBWithId,selectList);
         selectList.append(selectVisitorList);
 
 
@@ -313,8 +313,8 @@ void FaceDiscernThreadHelper::requestScreenShot(){
  * @param list
  */
 void FaceDiscernThreadHelper::receiveInsertFaceData(QList<Terran> list){
-//    //再次查询数据库，以确认插入正确，
-//    SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDBWithId,list);
+    //    //再次查询数据库，以确认插入正确，
+    //    SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDBWithId,list);
 
     downPicFromServer(list);
 }
