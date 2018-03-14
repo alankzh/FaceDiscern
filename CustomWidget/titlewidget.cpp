@@ -42,11 +42,6 @@ void TitleWidget::init(){
     mainLayout->addWidget(labelView,Qt::AlignRight|Qt::AlignVCenter);
 
     this->setLayout(mainLayout);
-
-    qtimer=new QTimer(this);
-    qtimer->setInterval(2000);//2s钟更新一次延迟
-    connect(qtimer,SIGNAL(timeout()),this,SLOT(fakeMs()));
-    qtimer->start();
 }
 
 /**
@@ -76,17 +71,21 @@ void TitleWidget::setDelay(int ms){
     delayText->setText(str);
 }
 
-void TitleWidget::setAlive(bool alive){
+/**
+ * @brief TitleWidget::setHttpAlive
+ * 设置连接是否断开
+ * @param alive
+ */
+void TitleWidget::setHttpAlive(bool alive){
     if(alive){
+        statuText->setFontStyle(14,QColor(255,255,255));
         statuText->setText(QString::fromLocal8Bit("运行中"));
     }else{
+        statuText->setFontStyle(14,QColor(255,0,0));
         statuText->setText(QString::fromLocal8Bit("断开"));
     }
 }
 
-void TitleWidget::fakeMs(){
-    setDelay(rand()%200);
-}
 
 void TitleWidget::paintEvent(QPaintEvent *event){
     Q_UNUSED(event);

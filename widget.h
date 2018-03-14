@@ -24,13 +24,12 @@ public:
 private slots:
 //    void captureFrameImage(int,QImage);
     void receiveAskCapture();
-    void receiveCaptureImage(QImage image);//摄像机传回的截图
+    void receiveCaptureImage(QImage &image);//摄像机传回的截图
     void receiveDetectTerran(QList<Terran> terranList);//引擎传回的检测员工
 
     void errorDispose(QString str);
-    void httpDisconnect();
 signals:
-    void sendImageToFaceEngine(QImage image);//发送截图到人脸识别引擎
+    void sendImageToFaceEngine(QImage &image);//发送截图到人脸识别引擎
 protected:
     virtual void paintEvent(QPaintEvent* event);
 private:

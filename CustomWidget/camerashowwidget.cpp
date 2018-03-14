@@ -29,16 +29,17 @@ void CameraShowWidget::init(){
     camera->start();
     camera->setCaptureMode(QCamera::CaptureStillImage);
 
+    cameraImageCapture->setBufferFormat(QVideoFrame::Format_RGB32);
+    cameraImageCapture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
+    qDebug()<< cameraImageCapture->isCaptureDestinationSupported(QCameraImageCapture :: CaptureToBuffer);
+    qDebug()<<cameraImageCapture->isReadyForCapture();
+    //    cameraImageCapture->capture();//先截图防卡顿  qt的摄像机截图会卡顿一下
     connect(cameraImageCapture, SIGNAL(imageCaptured(int,QImage)), this, SLOT(receiveCapturedImage(int,QImage)));
 
     mainLayout->addWidget(customViewFinder);
     this->setLayout(mainLayout);
 
     httpUtil=new HttpUtil();
-    qtimer=new QTimer(this);
-    qtimer->setInterval(60000);//60s钟清空一次签到
-    connect(qtimer,SIGNAL(timeout()),this,SLOT(clearSignedTerran()));
-    qtimer->start();
 }
 
 
@@ -64,11 +65,11 @@ void CameraShowWidget::onTerranEnter(QList<Terran> listFromEngine){
     qDebug()<<"CameraShowWidget::onTerranEnter";
 
 
-    for(Terran terran:listFromEngine){
-        qDebug()<<"engine terran id:"<<terran.id<<"left:"<<terran.frFaceInput.rcFace.left<<"top:"<<terran.frFaceInput.rcFace.top<<"right:"<<terran.frFaceInput.rcFace.right<<"bottom:"<<terran.frFaceInput.rcFace.bottom;
-        //        qDebug()<<inCameraTerranList.size();
-        //        qDebug()<<listFromEngine.at(0).id;
-    }
+//    for(Terran terran:listFromEngine){
+//        qDebug()<<"engine terran id:"<<terran.id<<"left:"<<terran.frFaceInput.rcFace.left<<"top:"<<terran.frFaceInput.rcFace.top<<"right:"<<terran.frFaceInput.rcFace.right<<"bottom:"<<terran.frFaceInput.rcFace.bottom;
+//        //        qDebug()<<inCameraTerranList.size();
+//        //        qDebug()<<listFromEngine.at(0).id;
+//    }
 
     QList<Terran> insertList={};
     QList<Terran> deleteList={};
@@ -125,7 +126,7 @@ void CameraShowWidget::onTerranEnter(QList<Terran> listFromEngine){
 
 
 void CameraShowWidget::receiveCapturedImage(int, QImage image){
-    qDebug()<<"CameraShowWidget::captureImageFromCamera";
+    qDebug()<<"CameraShowWidget::receiveCapturedImage";
     emit sendCaptureImage(image);
 }
 
@@ -140,53 +141,56 @@ void CameraShowWidget::captureImageFromCamera(){
  * @param insertList
  */
 void CameraShowWidget::insertTerran(QList<Terran> &insertList){
-    bool hasSigned=false;
-    for(Terran terran:insertList){
-        qDebug()<<"insert";
+//    for(Terran terran:insertList){
+//        qDebug()<<"insert";
+//        if(terran.id>0){
+//            emit newTerranSign(terran);
+//        }
+//        customViewFinder->addTerranRect(terran);//出现时自动开始动画
+//    }
+        bool hasSigned=false;
+        for(Terran terran:insertList){
+            qDebug()<<"insert";
 
-        if(terran.id>0){
-            hasSigned=false;
-            for(Terran signedTerran:signedList){
-                if(signedTerran.id==terran.id){
-                    hasSigned=true;
-                    break;
+            if(terran.id>0){
+                hasSigned=false;
+                for(Terran signedTerran:signedList){
+                    if(signedTerran.id==terran.id){
+                        hasSigned=true;
+                        break;
+                    }
+                }
+                if(!hasSigned){
+                    signedList.append(terran);
+                    /*向展示性控件通知有新人签到*/
+                    emit newTerranSign(terran);
+
+                    /*向服务器发送签到消息*/
+                    QString url=SEND_SIGN_IN_MESSAGE_URL;
+                    url.append(QString::fromLocal8Bit("&Name="));
+                    url.append(terran.name);
+
+                    url.append(QString::fromLocal8Bit("&UserId="));
+                    url.append(QString::number(terran.id));
+
+                    url.append(QString::fromLocal8Bit("&Type="));
+                    url.append(QString::fromLocal8Bit("true"));
+
+                    url.append(QString::fromLocal8Bit("&Department="));
+                    url.append(QString::number(terran.departmentId));
+
+                    url.append(QString::fromLocal8Bit("&Work="));
+                    url.append(QString::fromLocal8Bit("true"));
+
+                    httpUtil->sendMessage(url.toUtf8());
                 }
             }
-            if(!hasSigned){
-                signedList.append(terran);
-                /*向展示性控件通知有新人签到*/
-                emit newTerranSign(terran);
 
-                /*向服务器发送签到消息*/
-                QString url=SEND_SIGN_IN_MESSAGE_URL;
-                url.append(QString::fromLocal8Bit("&Name="));
-                url.append(terran.name);
-
-                url.append(QString::fromLocal8Bit("&UserId="));
-                url.append(QString::number(terran.id));
-
-                url.append(QString::fromLocal8Bit("&Type="));
-                url.append(QString::fromLocal8Bit("true"));
-
-                url.append(QString::fromLocal8Bit("&Department="));
-                url.append(QString::number(terran.departmentId));
-
-                url.append(QString::fromLocal8Bit("&Work="));
-                url.append(QString::fromLocal8Bit("true"));
-
-                httpUtil->sendMessage(url.toUtf8());
-            }
+            customViewFinder->addTerranRect(terran);//出现时自动开始动画
         }
-
-        customViewFinder->addTerranRect(terran);//出现时自动开始动画
-    }
 }
 
-/**
- * @brief CameraShowWidget::clearSignedTerran
- * 清空已签到缓存
- */
-void CameraShowWidget::clearSignedTerran(){
+void CameraShowWidget::clearSignedTerranCache(){
     signedList.clear();
     signedList={};
 }

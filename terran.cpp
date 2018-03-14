@@ -52,6 +52,77 @@ bool Terran::equals(Terran &terran){
     return true;
 }
 
+/**
+ * @brief Terran::ServerDataequals
+ * 对比服务器上数据库是否相同
+ * @param terran
+ * @return
+ */
+bool Terran::ServerDataequals(Terran &terran){
+    if(this->id!=terran.id){
+        return false;
+    }else if(this->departmentId!=terran.departmentId){
+        return false;
+    }else if(this->name!=terran.name){
+        return false;
+    }else if(this->openId!=terran.openId){
+        return false;
+    }else if(this->photoUrl!=terran.photoUrl){
+        return false;
+    }else if(this->position!=terran.position){
+        return false;
+    }else if(this->faceToken!=terran.faceToken){
+        return false;
+    }else if(this->department!=terran.department){
+        return false;
+    }else if(this->begTime!=terran.begTime){
+        return false;
+    }else if(this->endTime!=terran.endTime){
+        return false;
+    }else if(this->date!=terran.date){
+        return false;
+    }else if(this->typeOfWork!=terran.typeOfWork){
+        return false;
+    }else if(this->isUpdate!=terran.isUpdate){
+        return false;
+    }
+
+    return true;
+}
+
+QString Terran::toString(){
+    QString str;
+    str.append(QString::fromLocal8Bit(" terran id:"));
+    str.append(QString::number(this->id));
+
+    str.append(QString::fromLocal8Bit(" terran name:"));
+    str.append(this->name);
+    str.append(QString::fromLocal8Bit(" terran openid:"));
+    str.append(this->openId);
+    str.append(QString::fromLocal8Bit(" terran photoUrl:"));
+    str.append(this->photoUrl);
+    str.append(QString::fromLocal8Bit(" terran position:"));
+    str.append(this->position);
+    str.append(QString::fromLocal8Bit(" terran faceToken:"));
+    str.append(this->faceToken);
+    str.append(QString::fromLocal8Bit(" terran departmentid:"));
+    str.append(QString::number(this->departmentId));
+    str.append(QString::fromLocal8Bit(" terran department:"));
+    str.append(this->department);
+    str.append(QString::fromLocal8Bit(" terran begTime:"));
+    str.append(this->begTime);
+    str.append(QString::fromLocal8Bit(" terran endTime:"));
+    str.append(this->endTime);
+    str.append(QString::fromLocal8Bit(" terran date:"));
+    str.append(this->date);
+    str.append(QString::fromLocal8Bit(" terran typeOfWork:"));
+    str.append(QString::number(this->typeOfWork));
+    str.append(QString::fromLocal8Bit(" terran isUpdate:"));
+    str.append(QString::number(this->isUpdate));
+
+    return str;
+}
+
 
 /**
  * @brief Terran::quickSort

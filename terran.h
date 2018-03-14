@@ -30,6 +30,8 @@ public:
     bool isUpdate=false;//update更名为isUpdate，原名与数据库关键字冲突
 
     bool equals(Terran &terran);
+    bool ServerDataequals(Terran &terran);
+    QString toString();
 
     static void quickSort(QList<Terran> &list,int begin,int end);
 
@@ -39,12 +41,12 @@ public:
     AFR_FSDK_FACEINPUT frFaceInput;//人脸矩形
 
 
-//    bool operator==(const Terran &ref){
-//        return id==ref.id;
-//    }
-//    bool operator!=(const Terran &ref){
-//        return !(id==ref.id);
-//    }
+    //    bool operator==(const Terran &ref){
+    //        return id==ref.id;
+    //    }
+    //    bool operator!=(const Terran &ref){
+    //        return !(id==ref.id);
+    //    }
 
 private:
     static int partition(QList<Terran> &list,int begin,int end);

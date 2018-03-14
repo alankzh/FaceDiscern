@@ -25,12 +25,15 @@ public slots:
 signals:
     void httpError(int httpErrorCode);
     void receiveResponseStr(QString &str);
+    void httpConnectionDelay(int msec);
 private slots:
     void httpFinishedSlot(QNetworkReply *reply);
 private:
     void errorCatch(int errorCode);
     QNetworkAccessManager *netManager;
     QNetworkReply *netReply;
+
+    int httpRequestMsecToStartTime;//从一天开始时间 到最近一次http请求的毫秒数  每天的00：00 可能会显示有问题
 };
 
 #endif // HEARTBEAT_H

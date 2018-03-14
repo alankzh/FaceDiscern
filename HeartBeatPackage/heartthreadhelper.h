@@ -16,6 +16,7 @@
 #include <QString>
 #include "DBC/sqldatabase.h"
 #include "constant.h"
+#include "httputil.h"
 
 /**
  * @brief The HeartThreadHelper class
@@ -35,7 +36,9 @@ signals:
     void beginThread();//线程开始
     void endThread();//线程结束
 
-    void httpConnectionBreak();//与服务器连接断开
+    void httpConnectionAlive(bool alive);//与服务器连接是断开还是连接上了
+    void httpConnectionDelay(int ms);//与服务器连接延迟
+
     void httpServerError(QString errorHint);//服务错误，一般为我们的服务器关了
 
     void insertDBsynchronized(QList<Terran> insertList);//服务器上的新增数据同步完毕
@@ -45,11 +48,16 @@ private slots:
     void environmentInit();
     void receiveTerrans(QString &str);
     void httpErrorInHeart(int errorCode);
+
+    void heartBeatDelay(int mesc);
 private:
     void synchronizationData(QList<Terran> &listFromServer);
+
+    void downAndInsertImageToDB(QList<Terran> &list);
     QThread *thread;
     HeartBeat *heartbeat=nullptr;
     QList<Terran> terranList;//缓存的人员数据
+    HttpUtil *httpUtil;
 };
 
 #endif // HEARTTHREADHELPER_H

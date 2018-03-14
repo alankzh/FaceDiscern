@@ -29,7 +29,7 @@ void Widget::init(){
     systemLogoWidget=new SystemLogoWidget(this);
 
     cameraShowWidget=new CameraShowWidget(this);
-    connect(cameraShowWidget,SIGNAL(sendCaptureImage(QImage)),this,SLOT(receiveCaptureImage(QImage)));
+    connect(cameraShowWidget,SIGNAL(sendCaptureImage(QImage&)),this,SLOT(receiveCaptureImage(QImage&)));
 
     QHBoxLayout *bottomLayout=new QHBoxLayout();
     bottomLayout->setContentsMargins(15,15,20,20);
@@ -53,12 +53,14 @@ void Widget::init(){
 
     connect(cameraShowWidget,SIGNAL(newTerranSign(Terran)),signMessageWidget,SLOT(signIn(Terran)));//新员工签到
     connect(cameraShowWidget,SIGNAL(newTerranSign(Terran)),signNumWidget,SLOT(signIn(Terran)));//新员工签到，已签到人数+1
+    connect(systemLogoWidget,SIGNAL(clearTerranSignCache()),cameraShowWidget,SLOT(clearSignedTerranCache()));//清空已签到缓存
+    connect(systemLogoWidget,SIGNAL(clearTerranSignNum()),signNumWidget,SLOT(clearSignedTerranNum()));//清空签到人数
 
     this->setLayout(mainLayout);
 
     faceDiscernThreadHelper=new FaceDiscernThreadHelper();
     connect(faceDiscernThreadHelper,SIGNAL(askCapture()),this,SLOT(receiveAskCapture()));//引擎请求截图信号askCapture() ->> 接收到请求截图receiveAskCapture()
-    connect(this,SIGNAL(sendImageToFaceEngine(QImage)),faceDiscernThreadHelper,SLOT(receiveCaptureImage(QImage)));
+    connect(this,SIGNAL(sendImageToFaceEngine(QImage&)),faceDiscernThreadHelper,SLOT(receiveCaptureImage(QImage&)));
     connect(faceDiscernThreadHelper,SIGNAL(error(QString)),this,SLOT(errorDispose(QString)));
     connect(faceDiscernThreadHelper,SIGNAL(sendTerran(QList<Terran>)),this,SLOT(receiveDetectTerran(QList<Terran>)));
 
@@ -68,13 +70,14 @@ void Widget::init(){
 
     heartBeatThreadHelper=new HeartThreadHelper();
     connect(heartBeatThreadHelper,SIGNAL(httpServerError(QString)),this,SLOT(errorDispose(QString)));
-    connect(heartBeatThreadHelper,SIGNAL(httpConnectionBreak()),this,SLOT(httpDisconnect()));
+    connect(heartBeatThreadHelper,SIGNAL(httpConnectionDelay(int)),titleWidget,SLOT(setDelay(int)));//延迟毫秒数
+    connect(heartBeatThreadHelper,SIGNAL(httpConnectionAlive(bool)),titleWidget,SLOT(setHttpAlive(bool)));//连接断开的ui提示
     connect(heartBeatThreadHelper,SIGNAL(insertDBsynchronized(QList<Terran>)),faceDiscernThreadHelper,SLOT(receiveInsertFaceData(QList<Terran>)));
     connect(heartBeatThreadHelper,SIGNAL(deleteDBsynchronized(QList<Terran>)),faceDiscernThreadHelper,SLOT(receiveDeleteFaceData(QList<Terran>)));
     connect(heartBeatThreadHelper,SIGNAL(updateDBsynchronized(QList<Terran>)),faceDiscernThreadHelper,SLOT(receiveUpdateFaceData(QList<Terran>)));
 
     faceDiscernThreadHelper->startThread();//开始人脸识别线程
-//    heartBeatThreadHelper->startThread();//开始心跳线程
+    heartBeatThreadHelper->startThread();//开始心跳线程
 }
 
 void Widget::paintEvent(QPaintEvent *event){
@@ -89,12 +92,10 @@ void Widget::paintEvent(QPaintEvent *event){
 
 void Widget::receiveAskCapture()
 {
-        qDebug()<<"Widget::receiveAskCapture";
     cameraShowWidget->captureImageFromCamera();
 }
 
-void Widget::receiveCaptureImage(QImage image){
-        qDebug()<<" Widget::receiveCaptureImage";
+void Widget::receiveCaptureImage(QImage &image){
     emit sendImageToFaceEngine(image);//发送截图到人脸识别引擎
 }
 
@@ -115,12 +116,4 @@ void Widget::errorDispose(QString str){
     QCoreApplication::instance()->quit();
 }
 
-/**
- * @brief Widget::httpDisconnect
- * 与服务器连接断开
- * 不做强退处理，仅提示断线，正在使用离线版
- */
-void Widget::httpDisconnect(){
-//    titleWidget->setAlive(false);
-}
 

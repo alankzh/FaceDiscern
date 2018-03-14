@@ -8,15 +8,15 @@ DBCTestWidget::DBCTestWidget(QWidget *parent):QWidget(parent)
 
     SQLDataBase::instance()->connectionDB(testDBName);
 
-//    QImage *image=new QImage();
+    //    QImage *image=new QImage();
 
-//    QImage image;
-//    Terran terran;
-//    terran.id=1;
-//    QList<Terran> list;
-//    list.append(terran);
+    //    QImage image;
+    //    Terran terran;
+    //    terran.id=1;
+    //    QList<Terran> list;
+    //    list.append(terran);
 
-//    SQLDataBase::instance()->operationDB(testDBName, SQLDataBase::OperationWay::LoadDBImage,list,&image);
+    //    SQLDataBase::instance()->operationDB(testDBName, SQLDataBase::OperationWay::LoadDBImage,list,&image);
 
     Terran terran2;
     terran2.id=350;
@@ -24,10 +24,20 @@ DBCTestWidget::DBCTestWidget(QWidget *parent):QWidget(parent)
     list2.append(terran2);
     SQLDataBase::instance()->operationDB(testDBName, SQLDataBase::OperationWay::SelectDBWithId,list2);
 
-    qDebug()<<list2.first().department;
+    qDebug()<<list2.first().typeOfWork;
 
-//    qDebug()<<image.byteCount();
-//    if(image.byteCount()>0){
-//        label->setPixmap(QPixmap::fromImage(image));
-//    }
+    list2.first().typeOfWork=true;
+
+    qDebug()<<list2.first().typeOfWork;
+
+    SQLDataBase::instance()->operationDB(testDBName, SQLDataBase::OperationWay::UpdateDB,list2);
+
+
+    SQLDataBase::instance()->operationDB(testDBName, SQLDataBase::OperationWay::SelectDBWithId,list2);
+    qDebug()<<list2.first().typeOfWork;
+
+    //    qDebug()<<image.byteCount();
+    //    if(image.byteCount()>0){
+    //        label->setPixmap(QPixmap::fromImage(image));
+    //    }
 }

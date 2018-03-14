@@ -28,3 +28,4 @@ void SignBottomLeftWidget::paintEvent(QPaintEvent *event){
     QPainter painter(this);
     painter.drawPixmap(event->rect(),backgroundPix,event->rect());
 }
+

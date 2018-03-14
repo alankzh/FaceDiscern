@@ -93,11 +93,10 @@ void CustomCameraViewFinder::paintEvent(QPaintEvent *event){
  * @param terran
  */
 void CustomCameraViewFinder::addTerranRect(Terran terran){
-    qDebug()<<QString::fromLocal8Bit("已经绘制的人脸数量")<<faceRectList.size();
     FacePainterRect *faceRect=new FacePainterRect();
-    qDebug()<<terran.id;
+
     faceRect->setTerran(terran);
-    qDebug()<<terran.id;
+
     connect(faceRect,SIGNAL(askUpdateUI()),this,SLOT(answerUpdateUI()));
     connect(faceRect,SIGNAL(disappeartAnimatorEnd(int)),this,SLOT(onDisappearAnimatorEnd(int)));
 
@@ -107,10 +106,10 @@ void CustomCameraViewFinder::addTerranRect(Terran terran){
         faceRect->startAppearAnimator();
     }
 
-    qDebug()<<QString::fromLocal8Bit("新加入之后的人脸数量")<<faceRectList.size();
-    for(FacePainterRect* faceRect:faceRectList){
-        qDebug()<<"terran in camera insert id:"<<terran.id<<"left:"<<faceRect->left<<"top:"<<faceRect->top<<"right:"<<faceRect->right<<"bottom"<<faceRect->bottom;
-    }
+//    qDebug()<<QString::fromLocal8Bit("新加入之后的人脸数量")<<faceRectList.size();
+//    for(FacePainterRect* faceRect:faceRectList){
+//        qDebug()<<"terran in camera insert id:"<<terran.id<<"left:"<<faceRect->left<<"top:"<<faceRect->top<<"right:"<<faceRect->right<<"bottom"<<faceRect->bottom;
+//    }
 }
 
 /**
@@ -163,11 +162,10 @@ void CustomCameraViewFinder::startDisappearAnimator(int terranId){
  * @param terran
  */
 void CustomCameraViewFinder::updateFaceRect(Terran terran){
-    qDebug()<<"CustomCameraViewFinder::updateFaceRect";
     for(FacePainterRect* faceRect:faceRectList){
         if(faceRect->getTerranId()==terran.id){
             faceRect->setTerran(terran);
-            qDebug()<<"terran id:"<<terran.id<<"in camera left:"<<faceRect->left<<"top:"<<faceRect->top<<"right:"<<faceRect->right<<"bottom"<<faceRect->bottom;
+//            qDebug()<<"terran id:"<<terran.id<<"in camera left:"<<faceRect->left<<"top:"<<faceRect->top<<"right:"<<faceRect->right<<"bottom"<<faceRect->bottom;
         }
     }
 

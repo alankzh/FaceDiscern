@@ -26,16 +26,15 @@ public:
 
     void setStatus(TitleWidget::RunningStatus status);
 
-    void setDelay(int ms);
-
-    void setAlive(bool alive);
-
     const int width=1920;
     const int height=50;
+
+public slots:
+    void setDelay(int ms);
+
+    void setHttpAlive(bool alive);
 protected:
     virtual void paintEvent(QPaintEvent *event);
-private slots:
-    void fakeMs();
 private:
     void init();
     QPixmap backgroundPix;

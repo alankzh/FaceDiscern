@@ -47,3 +47,12 @@ void SignBottomRightWidget::addSignNum(int num){
     numText->setText(QString::number(nowNum));
     update();
 }
+
+/**
+ * @brief SignBottomRightWidget::clearSignedTerranNum
+ * 每日12点清空签到人数
+ */
+void SignBottomRightWidget::clearSignedTerranNum(){
+    nowNum=0;
+    numText->setText(QString::number(0));
+}

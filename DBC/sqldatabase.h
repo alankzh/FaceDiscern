@@ -42,7 +42,7 @@ private:
     void selectDBWithId(QSqlDatabase *sqldb,QList<Terran> &list);
 
     void saveImage(QSqlDatabase *sqldb,QList<Terran> &list,QImage *image);
-    void deleteImage(QSqlDatabase *sqldb,QList<Terran> &list,QImage *image);
+    void deleteImage(QSqlDatabase *sqldb,QList<Terran> &list);
     void updateImage(QSqlDatabase *sqldb,QList<Terran> &list,QImage *image);
     void loadImage(QSqlDatabase *sqldb,QList<Terran> &list,QImage *image);
 public:

@@ -37,3 +37,7 @@ void SignBottomWidget::addSignNum(int num){
 void SignBottomWidget::signIn(Terran terran){
     addSignNum(1);
 }
+
+void SignBottomWidget::clearSignedTerranNum(){
+    rightWidget->clearSignedTerranNum();
+}

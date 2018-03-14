@@ -2,8 +2,7 @@
 
 using namespace rapidjson;
 
-HeartThreadHelper::HeartThreadHelper(QObject *obj):QObject(obj)
-{
+HeartThreadHelper::HeartThreadHelper(QObject *obj):QObject(obj){
 
 }
 
@@ -11,6 +10,10 @@ HeartThreadHelper::~HeartThreadHelper(){
     if(heartbeat!=nullptr){
         delete heartbeat;
         heartbeat=nullptr;
+    }
+    if(httpUtil!=nullptr){
+        delete httpUtil;
+        httpUtil=nullptr;
     }
 }
 
@@ -36,6 +39,8 @@ void HeartThreadHelper::environmentInit(){
     heartbeat=new HeartBeat();
     connect(heartbeat,SIGNAL(receiveResponseStr(QString&)),this,SLOT(receiveTerrans(QString&)));
     connect(heartbeat,SIGNAL(httpError(int)),this,SLOT(httpErrorInHeart(int)));
+    connect(heartbeat,SIGNAL(httpConnectionDelay(int)),this,SLOT(heartBeatDelay(int)));
+    httpUtil=new HttpUtil();
 
     bool success=SQLDataBase::instance()->connectionDB(HEART_DB_CONNECTION_NAME);//打开数据库连接
     if(!success){
@@ -56,7 +61,7 @@ void HeartThreadHelper::environmentInit(){
  * @param str
  */
 void HeartThreadHelper::receiveTerrans(QString &str){
-    QList<Terran> list;
+    QList<Terran> list={};
     Document document;
     document.Parse<0>(str.toStdString().c_str());
     Value &jsonDataArray=document["Data"];
@@ -100,14 +105,21 @@ void HeartThreadHelper::httpErrorInHeart(int errorCode){
     switch(errorCode){
     case 404:
         emit httpServerError(QString::fromLocal8Bit("服务器地址不存在"));
+        emit httpConnectionAlive(false);//通知连接断开
         break;
     case 503:
         emit httpServerError(QString::fromLocal8Bit("服务不可用"));
+        emit httpConnectionAlive(false);//通知连接断开
         break;
     default:
-        emit httpConnectionBreak();
+        emit httpConnectionAlive(false);//通知连接断开
         break;
     }
+}
+
+void HeartThreadHelper::heartBeatDelay(int mesc){
+    emit httpConnectionDelay(mesc);
+    emit httpConnectionAlive(true);//通知连接建立
 }
 
 /**
@@ -120,6 +132,21 @@ void HeartThreadHelper::httpErrorInHeart(int errorCode){
  * @param listFromServer
  */
 void HeartThreadHelper::synchronizationData(QList<Terran> &listFromServer){
+    qDebug()<<terranList.size();
+    qDebug()<<listFromServer.size();
+
+    for(Terran terran:terranList){
+        if(terran.id==92){
+            qDebug()<<"local:"<<terran.id;
+        }
+    }
+
+    for(Terran terran:listFromServer){
+        if(terran.id==92){
+            qDebug()<<"server:"<<terran.id;
+        }
+    }
+
     //保证服务器上数据的次序，一般可省略，因为服务器上的次序一般是按照id从小到大排列的
     Terran::quickSort(listFromServer,0,listFromServer.size()-1);
     QList<Terran> insertList={};
@@ -148,14 +175,20 @@ void HeartThreadHelper::synchronizationData(QList<Terran> &listFromServer){
         }
 
         Terran localIndextTerran=terranList.at(localIndex);
-        Terran serverIndexTerran=terranList.at(serverIndex);
-        if(localIndextTerran.equals(serverIndexTerran)){
+        Terran serverIndexTerran=listFromServer.at(serverIndex);
+
+        if(localIndextTerran.ServerDataequals(serverIndexTerran)){
             localIndex++;
             serverIndex++;
             continue;
         }else{
             if(localIndextTerran.id==serverIndexTerran.id){
                 //本地数据和服务器数据id相同，但数据不一致，需要更新
+                qDebug()<<QString::fromLocal8Bit("本地数据和服务器数据id相同，但数据不一致，需要更新");
+
+                qDebug()<<localIndextTerran.toString();
+                qDebug()<<serverIndexTerran.toString();
+
                 updateList.append(serverIndexTerran);
                 localIndex++;
                 serverIndex++;
@@ -175,14 +208,21 @@ void HeartThreadHelper::synchronizationData(QList<Terran> &listFromServer){
         }
     }
 
+
     if(insertList.size()>0){
         SQLDataBase::instance()->operationDB(HEART_DB_CONNECTION_NAME,SQLDataBase::OperationWay::InsertDB,insertList);
+        downAndInsertImageToDB(insertList);
     }
     if(deleteList.size()>0){
         SQLDataBase::instance()->operationDB(HEART_DB_CONNECTION_NAME,SQLDataBase::OperationWay::DeleteDB,deleteList);
+        SQLDataBase::instance()->operationDB(HEART_DB_CONNECTION_NAME,SQLDataBase::OperationWay::DeleteImage,deleteList);
     }
     if(updateList.size()>0){
         SQLDataBase::instance()->operationDB(HEART_DB_CONNECTION_NAME,SQLDataBase::OperationWay::UpdateDB,updateList);
+
+        /*更新时，删除图片，再次下载,与直接更新是一样的，懒得再写downAndUpdateImageToDB函数了*/
+        SQLDataBase::instance()->operationDB(HEART_DB_CONNECTION_NAME,SQLDataBase::OperationWay::DeleteImage,updateList);
+        downAndInsertImageToDB(updateList);
     }
 
     //在所有的数据库操作完成后再发送信号，虽然数据库操作有同步锁，这是没有必要的
@@ -203,5 +243,28 @@ void HeartThreadHelper::synchronizationData(QList<Terran> &listFromServer){
         //用数据库查找的，而不是内存中的数据，以确保数据库操作后的一致性，以防操作失败
         terranList.clear();
         SQLDataBase::instance()->operationDB(HEART_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDB,terranList);
+    }
+
+}
+
+
+
+void HeartThreadHelper::downAndInsertImageToDB(QList<Terran> &list){
+    for(Terran needDownterran:list){
+        QString url=DOWNLOAD_PIC_URL_PRE+needDownterran.photoUrl;
+        QImage* image;
+        image=httpUtil->downLoadPic(url);//同步方式在下载
+
+        if(image!=nullptr){
+            Terran terran;
+            terran.id=needDownterran.id;
+            QList<Terran> insertList={};
+            insertList.append(terran);
+            SQLDataBase::instance()->operationDB(HEART_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SavaImage,insertList,image);
+
+            delete image;
+            qDebug()<<QString::fromLocal8Bit("继续下载下一张图片");
+        }else{
+        }
     }
 }

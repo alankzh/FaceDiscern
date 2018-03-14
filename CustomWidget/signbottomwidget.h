@@ -21,6 +21,8 @@ public:
     void addSignNum(int num);
 public slots:
     void signIn(Terran terran);
+
+    void clearSignedTerranNum();
 protected:
     virtual void paintEvent(QPaintEvent *event);
 private:

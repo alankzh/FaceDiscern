@@ -33,15 +33,16 @@ public:
     CustomCameraViewFinder *customViewFinder;
 public slots:
     void onTerranEnter(QList<Terran> terranList);
+
+    void clearSignedTerranCache();
 signals:
-    void sendCaptureImage(QImage image);
+    void sendCaptureImage(QImage &image);
 
     void newTerranSign(Terran terran);
 protected:
     virtual void paintEvent(QPaintEvent *event);
 private slots:
     void receiveCapturedImage(int,QImage);
-    void clearSignedTerran();
 private:
     void init();
     void insertTerran(QList<Terran> &insertList);
@@ -53,8 +54,8 @@ private:
     QList<Terran> inCameraTerranList={};
 
     QList<Terran> signedList={};//已经签到的人，5分钟清空一次
+
     HttpUtil *httpUtil;
-    QTimer *qtimer;
 };
 
 #endif // CAMERASHOWWIDGET_H

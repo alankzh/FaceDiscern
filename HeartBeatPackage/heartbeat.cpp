@@ -4,6 +4,8 @@ HeartBeat::HeartBeat(QObject *obj):QObject(obj)
 {
     netManager = new QNetworkAccessManager(this);
     QObject::connect(netManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(httpFinishedSlot(QNetworkReply*)));
+
+    httpRequestMsecToStartTime=0;
 }
 
 HeartBeat::~HeartBeat(){
@@ -28,6 +30,8 @@ void HeartBeat::beat(){
 
     netReply=netManager->get(request);
 //    connect(netReply, SIGNAL(readyRead()), this, SLOT(readFromResponse()));//准备读取，然后并不能读到全部数据
+    QTime currentTime=QTime::currentTime();
+    httpRequestMsecToStartTime=currentTime.msecsSinceStartOfDay();
 
     QEventLoop loop;
     QTimer timer;
@@ -43,12 +47,10 @@ void HeartBeat::beat(){
         timer.stop();
         netReply->abort();
         netReply->deleteLater();
-
     } else {
         //超时
         netReply->abort();
         netReply->deleteLater();
-
     }
 }
 
@@ -57,8 +59,7 @@ void HeartBeat::beat(){
  * 一次http连接结束的调用
  * @param reply
  */
-void HeartBeat::httpFinishedSlot(QNetworkReply *reply)
-{
+void HeartBeat::httpFinishedSlot(QNetworkReply *reply){
     qDebug()<<"HeartBeat::httpFinishedSlot";
     if (reply->error() == QNetworkReply::NoError){
         //链接完毕后能读取到全部数据
@@ -66,6 +67,9 @@ void HeartBeat::httpFinishedSlot(QNetworkReply *reply)
         QString readStr=QString::fromUtf8(byteArray);
 
         emit receiveResponseStr(readStr);
+
+        QTime currentTime=QTime::currentTime();
+        emit httpConnectionDelay(currentTime.msecsSinceStartOfDay()-httpRequestMsecToStartTime);
     }
     else{
 //        qDebug()<<"handle errors here";

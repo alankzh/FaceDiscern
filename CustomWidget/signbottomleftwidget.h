@@ -12,6 +12,7 @@ public:
     SignBottomLeftWidget(QWidget *parent=nullptr);
     const int width=570;
     const int height=116;
+
 protected:
     virtual void paintEvent(QPaintEvent *event);
 private:

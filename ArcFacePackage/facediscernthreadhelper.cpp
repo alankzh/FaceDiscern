@@ -9,10 +9,6 @@ FaceDiscernThreadHelper::~FaceDiscernThreadHelper(){
         delete faceDiscern;
         faceDiscern=nullptr;
     }
-    if(httpUtil!=nullptr){
-        delete httpUtil;
-        httpUtil=nullptr;
-    }
 }
 
 void FaceDiscernThreadHelper::startThread(){
@@ -44,21 +40,15 @@ void FaceDiscernThreadHelper::environmentInit(){
         emit error(QString::fromLocal8Bit("程序文件被破坏，初始化错误"));
     }
 
-    httpUtil=new HttpUtil();
-
     QList<Terran> terranList;//缓存的人员信息列表
     featureList={};
     //    downPicIndex=0;
     SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDB,terranList);
 
-    qDebug()<<QString::fromLocal8Bit("FaceDiscernThreadHelper 读取到的数据库中的数据长度:")<<terranList.size();
-
     loadPicFeatureFromDb(terranList);
-    bool sucess=downPicFromServer(terranList);  //TODO
-    if(success){
-        requestScreenShot();//请求截图
-        qDebug()<<"22222222222222222222222222222";
-    }
+
+
+    requestScreenShot();//请求截图
 }
 
 /**
@@ -66,9 +56,9 @@ void FaceDiscernThreadHelper::environmentInit(){
  * 接收屏幕截图的槽
  * @param image
  */
-void FaceDiscernThreadHelper::receiveCaptureImage(QImage image){
+void FaceDiscernThreadHelper::receiveCaptureImage(QImage &image){
     QImage scaledImage = image.scaled(QSize(1140,845),
-                                      Qt::IgnoreAspectRatio,
+                                      Qt::KeepAspectRatio,
                                       Qt::SmoothTransformation);
     //  TODO  scaledImage.save("E:\\sava.jpg");
     //    qDebug()<<scaledImage.size();
@@ -81,7 +71,6 @@ void FaceDiscernThreadHelper::receiveCaptureImage(QImage image){
         QList<Terran> selectList={};
         QList<Terran> selectVisitorList={};
         QList<TerranFaceFeature> selectVisitorFeatureList={};
-        qDebug()<<"featureList.size:"<<featureList.size();
         int faceNum=ftFaceRes->nFace;
         TerranFaceFeature xiaofang;
         TerranFaceFeature meijie;
@@ -105,10 +94,7 @@ void FaceDiscernThreadHelper::receiveCaptureImage(QImage image){
                         list.append(terran);
                         SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDBWithId,list);
                         Terran terran2=list.first();
-                        qDebug()<<terran2.name;
-                        qDebug()<<"frInput, left:"<<frInput.rcFace.left<<"right:"<<frInput.rcFace.right<<"top:"<<frInput.rcFace.top<<"bottom:"<<frInput.rcFace.bottom;
                         terran2.frFaceInput=frInput;//加上人脸矩形
-                        qDebug()<<"terran2, left:"<<terran2.frFaceInput.rcFace.left<<"right:"<<terran2.frFaceInput.rcFace.right<<"top:"<<terran2.frFaceInput.rcFace.top<<"bottom:"<<terran2.frFaceInput.rcFace.bottom;
                         selectList.append(terran2);
                         isEmployee=true;
                         break;
@@ -116,15 +102,13 @@ void FaceDiscernThreadHelper::receiveCaptureImage(QImage image){
                 }
             }
 
-            qDebug()<<QString::fromLocal8Bit("是否是雇员:")<<isEmployee;
             if(!isEmployee){
                 bool isCacheVisitor=false;
                 for(TerranFaceFeature cacheVisitorFeature:visitorFeatureList){
                     float similarity=0.0;
                     similarity=faceDiscern->FREngineCompareFaceFeature(&(cacheVisitorFeature.frFaceModelFeature),&(terranFaceFeature.frFaceModelFeature),errorCode);
-                    qDebug()<<QString::fromLocal8Bit("与缓存访客相似度 similarity:")<<similarity;
+                    //                    qDebug()<<QString::fromLocal8Bit("与缓存访客相似度 similarity:")<<similarity;
                     if(errorCode!=MOK){
-                        qDebug()<<QString::fromLocal8Bit("fr 匹配错误 错误参数:")<<errorCode;
                         errorCatch(errorCode,FaceDiscern::FailedType::FacePairMatchFailed);
                     }else{
                         if(similarity>=0.6){
@@ -167,7 +151,6 @@ void FaceDiscernThreadHelper::receiveCaptureImage(QImage image){
         ////        SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDBWithId,selectList);
         selectList.append(selectVisitorList);
 
-
         emit sendTerran(selectList);//发送此帧检测到的人脸数据
 
         //引擎传回来的Rect包含left、right、top、right，分别表示矩形最左边距离x为0点距离、最右边距离x为0点距离、最上边距离y为0点距离、最底边距离y为0点距离
@@ -177,86 +160,8 @@ void FaceDiscernThreadHelper::receiveCaptureImage(QImage image){
         //                emit sendFaceImage(faceImg);
     }
     //200ms后再次请求主线程发送截图过来
-    //        QTimer::singleShot(SCREEN_SHOT_CIRCLE,this,SLOT(requestScreenShot()));
-    QTimer::singleShot(0,this,SLOT(requestScreenShot()));
-}
-
-
-
-/**
- * @brief FaceDiscernThreadHelper::downPicFromServer
- * 从服务器上下载图片，提取特征，加入缓存，阻塞式
- */
-bool FaceDiscernThreadHelper::downPicFromServer(QList<Terran> terranList,int downPicIndex){
-    int breakCount=0;
-    while(true){
-        qDebug()<<QString::fromLocal8Bit("正在读取的索引:")<<downPicIndex;
-        if(downPicIndex>=terranList.size()){
-            break;
-        }
-
-        QString url=DOWNLOAD_PIC_URL_PRE+terranList.at(downPicIndex).photoUrl;
-
-        QImage* image;
-
-        image=httpUtil->downLoadPic(url);
-
-        if(image!=nullptr){
-            insertPicToDb(terranList.at(downPicIndex).id,image);//图片插入数据库缓存
-
-            TerranFaceFeature terranfaceFeature;
-            terranfaceFeature.id=terranList.at(downPicIndex).id;
-            int errorCode=0;
-            LPAFD_FSDK_FACERES fdFaceResult=faceDiscern->FDEngineDiscern(*image,errorCode);
-            if(errorCode!=MOK){
-                errorCatch(errorCode,FaceDiscern::FailedType::FaceDetectFailed);
-                return false;
-            }
-            AFR_FSDK_FACEINPUT frInput=faceDiscern->getFREngineFaceInput(fdFaceResult);
-            terranfaceFeature.frFaceModelFeature=faceDiscern->FREngineExtractFaceFeature(*image,frInput,errorCode);
-            if(errorCode!=MOK){
-                errorCatch(errorCode,FaceDiscern::FailedType::FaceExtractFeatureFailed);
-                return false;
-            }
-            featureList.append(terranfaceFeature);
-            downPicIndex++;
-            delete image;
-            qDebug()<<QString::fromLocal8Bit("继续下载下一张图片");
-        }else{
-            //            //继续前一张图片的下载
-            //            breakCount++;
-            //            //超时三次退出循环，打印错误
-            //            if(breakCount>=3){
-            //                break;
-            //            }
-            downPicIndex++;//下载下一张图片，佛系编程，我不强求。
-        }
-    }
-
-    if(downPicIndex>=terranList.size()){
-        //图片全部下载完毕，可以开始识别
-        qDebug()<<QString::fromLocal8Bit("图片全部下载完毕，可以开始识别");
-        //        requestScreenShot();
-        return true;
-    }else{
-        //通知网络错误
-        emit error(QString::fromLocal8Bit("下载服务器数据失败"));
-        return false;
-    }
-}
-
-/**
- * @brief FaceDiscernThreadHelper::insertPicToDb
- * 插入图片到数据库中
- * @param terranId
- * @param image
- */
-void FaceDiscernThreadHelper::insertPicToDb(int terranId, QImage *image){
-    Terran terran;
-    terran.id=terranId;
-    QList<Terran> insertList={};
-    insertList.append(terran);
-    SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SavaImage,insertList,image);
+    QTimer::singleShot(SCREEN_SHOT_CIRCLE,this,SLOT(requestScreenShot()));
+//        QTimer::singleShot(0,this,SLOT(requestScreenShot()));
 }
 
 /**
@@ -290,12 +195,13 @@ void FaceDiscernThreadHelper::loadPicFeatureFromDb(QList<Terran> &terranList){
             featureList.append(terranfaceFeature);
             delete image;
             iter.remove();//有本地缓存了，就不用down网页上的了
-            qDebug()<<QString::fromLocal8Bit("加载成功，继续加载下一张图片缓存");
+            qDebug()<<QString::fromLocal8Bit("加载成功，terran id:")<<terran.id;
         }else{
             delete image;
             qDebug()<<QString::fromLocal8Bit("加载失败，阿弥陀佛，随缘吧，继续下载下一张图片缓存");
         }
     }
+    qDebug()<<featureList.size();
 }
 
 
@@ -313,10 +219,7 @@ void FaceDiscernThreadHelper::requestScreenShot(){
  * @param list
  */
 void FaceDiscernThreadHelper::receiveInsertFaceData(QList<Terran> list){
-    //    //再次查询数据库，以确认插入正确，
-    //    SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDBWithId,list);
-
-    downPicFromServer(list);
+    loadPicFeatureFromDb(list);
 }
 
 /**
@@ -325,9 +228,6 @@ void FaceDiscernThreadHelper::receiveInsertFaceData(QList<Terran> list){
  * @param list
  */
 void FaceDiscernThreadHelper::receiveDeleteFaceData(QList<Terran> list){
-    //    //再次查询数据库，以确认删除正确，
-    //    SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDBWithId,list);
-
     for(Terran terran:list){
         QMutableListIterator<TerranFaceFeature> iter(featureList);
         while(iter.hasNext()){
@@ -345,9 +245,6 @@ void FaceDiscernThreadHelper::receiveDeleteFaceData(QList<Terran> list){
  * @param list
  */
 void FaceDiscernThreadHelper::receiveUpdateFaceData(QList<Terran> list){
-    //    //再次查询数据库，以确认更新正确，
-    //    SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDBWithId,list);
-
     for(Terran terran:list){
         QMutableListIterator<TerranFaceFeature> iter(featureList);
         while(iter.hasNext()){
@@ -358,7 +255,7 @@ void FaceDiscernThreadHelper::receiveUpdateFaceData(QList<Terran> list){
         }
     }
 
-    downPicFromServer(list);//再加入缓存
+    loadPicFeatureFromDb(list);//再加入缓存
 }
 
 /**

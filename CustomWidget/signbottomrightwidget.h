@@ -13,6 +13,8 @@ public:
     const int width=157;
     const int height=116;
     void addSignNum(int num);
+
+    void clearSignedTerranNum();//每日12点清空已签到人数
 protected:
     virtual void paintEvent(QPaintEvent *event);
 private:

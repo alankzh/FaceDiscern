@@ -146,8 +146,10 @@ bool SQLDataBase::operationDB(QString connectionName, SQLDataBase::OperationWay 
         saveImage(dbMap[connectionName],list,image);
         break;
     case OperationWay::DeleteImage:
+        deleteImage(dbMap[connectionName],list);
         break;
     case OperationWay::UpdateImage:
+        updateImage(dbMap[connectionName],list,image);
         break;
     case OperationWay::LoadDBImage:
         loadImage(dbMap[connectionName],list,image);
@@ -178,7 +180,7 @@ void SQLDataBase::insertDB(QSqlDatabase *sqldb, QList<Terran> &list){
         sqlQuery.bindValue(":begTime",terran.begTime);
         sqlQuery.bindValue(":endTime",terran.endTime);
         sqlQuery.bindValue(":date",terran.date);
-        sqlQuery.bindValue(":typeOfWork",terran.typeOfWork);
+        sqlQuery.bindValue(":typeOfwork",terran.typeOfWork);
         sqlQuery.bindValue(":isUpdate",terran.isUpdate);
 
         success=sqlQuery.exec();
@@ -238,7 +240,10 @@ void SQLDataBase::updateDB(QSqlDatabase *sqldb, QList<Terran> &list){
         sqlQuery.bindValue(":begTime",terran.begTime);
         sqlQuery.bindValue(":endTime",terran.endTime);
         sqlQuery.bindValue(":date",terran.date);
-        sqlQuery.bindValue(":typeOfWork",terran.typeOfWork);
+        sqlQuery.bindValue(":typeOfwork",terran.typeOfWork);
+
+        qDebug()<<QString::fromLocal8Bit("更新:")<<terran.typeOfWork;
+
         sqlQuery.bindValue(":isUpdate",terran.isUpdate);
         sqlQuery.bindValue(":id",terran.id);
 
@@ -249,7 +254,6 @@ void SQLDataBase::updateDB(QSqlDatabase *sqldb, QList<Terran> &list){
             //            sqldb->rollback();//回滚
             qDebug()<<"更新失败,id为:"<<terran.id<<" 错误为:"<<sqlQuery.lastError();
         }else{
-            qDebug()<<"更新成功:"<<terran.name;
         }
     }
 
@@ -267,19 +271,19 @@ void SQLDataBase::selectDB(QSqlDatabase *sqldb,QList<Terran> &list){
         while(sqlQuery.next())
         {
             Terran terran;
-            terran.id = sqlQuery.value(0).toInt();
-            terran.name=sqlQuery.value(1).toString();
-            terran.openId=sqlQuery.value(2).toString();
-            terran.photoUrl=sqlQuery.value(3).toString();
-            terran.position=sqlQuery.value(4).toString();
-            terran.faceToken=sqlQuery.value(5).toString();
-            terran.departmentId=sqlQuery.value(6).toInt();
-            terran.department=sqlQuery.value(7).toString();
-            terran.begTime=sqlQuery.value(8).toString();
-            terran.endTime=sqlQuery.value(9).toString();
-            terran.date=sqlQuery.value(10).toString();
-            terran.typeOfWork=sqlQuery.value(11).toBool();
-            terran.isUpdate=sqlQuery.value(12).toBool();
+            terran.id = sqlQuery.value("id").toInt();
+            terran.name=sqlQuery.value("name").toString();
+            terran.openId=sqlQuery.value("openId").toString();
+            terran.photoUrl=sqlQuery.value("photoUrl").toString();
+            terran.position=sqlQuery.value("position").toString();
+            terran.faceToken=sqlQuery.value("faceToken").toString();
+            terran.departmentId=sqlQuery.value("departmentId").toInt();
+            terran.department=sqlQuery.value("department").toString();
+            terran.begTime=sqlQuery.value("begTime").toString();
+            terran.endTime=sqlQuery.value("endTime").toString();
+            terran.date=sqlQuery.value("date").toString();
+            terran.typeOfWork=sqlQuery.value("typeOfwork").toBool();
+            terran.isUpdate=sqlQuery.value("isUpdate").toBool();
 
             list.append(terran);
         }
@@ -309,19 +313,21 @@ void SQLDataBase::selectDBWithId(QSqlDatabase *sqldb, QList<Terran> &list){
             while(sqlQuery.next())
             {
                 Terran terran;
-                terran.id = sqlQuery.value(0).toInt();
-                terran.name=sqlQuery.value(1).toString();
-                terran.openId=sqlQuery.value(2).toString();
-                terran.photoUrl=sqlQuery.value(3).toString();
-                terran.position=sqlQuery.value(4).toString();
-                terran.faceToken=sqlQuery.value(5).toString();
-                terran.departmentId=sqlQuery.value(6).toInt();
-                terran.department=sqlQuery.value(7).toString();
-                terran.begTime=sqlQuery.value(8).toString();
-                terran.endTime=sqlQuery.value(9).toString();
-                terran.date=sqlQuery.value(10).toString();
-                terran.typeOfWork=sqlQuery.value(11).toBool();
-                terran.isUpdate=sqlQuery.value(12).toBool();
+                terran.id = sqlQuery.value("id").toInt();
+                terran.name=sqlQuery.value("name").toString();
+                terran.openId=sqlQuery.value("openId").toString();
+                terran.photoUrl=sqlQuery.value("photoUrl").toString();
+                terran.position=sqlQuery.value("position").toString();
+                terran.faceToken=sqlQuery.value("faceToken").toString();
+                terran.departmentId=sqlQuery.value("departmentId").toInt();
+                terran.department=sqlQuery.value("department").toString();
+                terran.begTime=sqlQuery.value("begTime").toString();
+                terran.endTime=sqlQuery.value("endTime").toString();
+                terran.date=sqlQuery.value("date").toString();
+                terran.typeOfWork=sqlQuery.value("typeOfwork").toBool();
+                terran.isUpdate=sqlQuery.value("isUpdate").toBool();
+
+                qDebug()<<"111111:"<<sqlQuery.value("typeOfwork").toBool();
 
                 readlist.append(terran);
             }
@@ -365,22 +371,25 @@ void SQLDataBase::saveImage(QSqlDatabase *sqldb, QList<Terran> &list, QImage *im
     sqldb->commit();
 }
 
-void SQLDataBase::deleteImage(QSqlDatabase *sqldb, QList<Terran> &list, QImage *image){
-    Terran terran=list.first();//只存第一个
+void SQLDataBase::deleteImage(QSqlDatabase *sqldb, QList<Terran> &list){
+    sqldb->transaction();//开始事务，批量提交更有效率
     QString sqlStr="delete from terranImageData where id = :id";
     QSqlQuery sqlQuery(*sqldb);
 
-    sqlQuery.prepare(sqlStr);
-    sqlQuery.bindValue(":id",terran.id);
-
     bool success=false;
-    success=sqlQuery.exec();
-    if(!success){
-        //对于查找而言，一条语句失败就失败了，不必回滚全部
-        //            sqldb->rollback();//回滚
-        qDebug()<<"删除图片失败,id为:"<<terran.id<<" 错误为:"<<sqlQuery.lastError();
-    }else{
+
+    for(Terran deleteTerran:list){
+        sqlQuery.prepare(sqlStr);
+        sqlQuery.bindValue(":id",deleteTerran.id);
+        success=sqlQuery.exec();
+        if(!success){
+            //对于查找而言，一条语句失败就失败了，不必回滚全部
+            //            sqldb->rollback();//回滚
+            qDebug()<<"删除图片失败,id为:"<<deleteTerran.id<<" 错误为:"<<sqlQuery.lastError();
+        }else{
+        }
     }
+    sqldb->commit();
 }
 
 void SQLDataBase::updateImage(QSqlDatabase *sqldb, QList<Terran> &list, QImage *image){
@@ -428,7 +437,7 @@ void SQLDataBase::loadImage(QSqlDatabase *sqldb, QList<Terran> &list, QImage *im
             if(byte.size()>0){
                 //                image=new QImage();
                 image->loadFromData(byte,"JPG");
-//    TODO            image->save("E:\\dbimage.jpg");
+                //    TODO            image->save("E:\\dbimage.jpg");
             }
         }
     }

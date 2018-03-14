@@ -59,6 +59,7 @@ void SystemLogoWidget::init(){
     qtimer->setInterval(5000);//5s钟更新一次时间
     connect(qtimer,SIGNAL(timeout()),this,SLOT(updateTime()));
     qtimer->start();
+    timeMsec=0;
 }
 
 void SystemLogoWidget::paintEvent(QPaintEvent *event){
@@ -69,6 +70,17 @@ void SystemLogoWidget::paintEvent(QPaintEvent *event){
 
 //更新时间
 void SystemLogoWidget::updateTime(){
+    timeMsec+=5000;
+    if(timeMsec>=CLEAR_SIGN_CACHE_INTERVAL){
+        emit clearTerranSignCache();//通知清空缓存
+        timeMsec=0;
+    }
+    QTime currentQtime=QTime::currentTime();
+    int nowMsec=currentQtime.msecsSinceStartOfDay();
+    if(nowMsec<=5000){
+        emit clearTerranSignNum();//每日0点，清空签到人数
+    }
+
     QDateTime dateTime =QDateTime::currentDateTime();
     QString currentDate =dateTime.toString(QString::fromLocal8Bit("yyyy年MM月dd日"));
     QString currentTime=dateTime.toString("hh:mm");

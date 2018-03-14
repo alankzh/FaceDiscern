@@ -43,6 +43,9 @@ extern const unsigned int MAIN_WIDGET_WIDTH;
 //主窗口高度
 extern const unsigned int MAIN_WIDGET_HEIGHT;
 
+//清空一次签到缓存的时间间隔 60s
+extern const unsigned int CLEAR_SIGN_CACHE_INTERVAL;
+
 static int Visitor_Offsert_Id_static=-1;
 
 //QImage文件的临时暂存点

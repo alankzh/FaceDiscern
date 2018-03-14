@@ -27,6 +27,8 @@ public:
     };
 
     void loadData(QImage headerImage,QString name,QString department,TerranSignInMessageWidget::LabelType labelType=TerranSignInMessageWidget::LabelType::Work);
+
+
 protected:
     virtual void paintEvent(QPaintEvent *event);
 private:

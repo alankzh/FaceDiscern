@@ -31,7 +31,7 @@ signals:
 
     void error(QString errorHint);//发送错误提示，使用这个信号表示错误严重到必须退出程序
 public slots:
-    void receiveCaptureImage(QImage image);
+    void receiveCaptureImage(QImage &image);
 
     void receiveUpdateFaceData(QList<Terran> list);
     void receiveDeleteFaceData(QList<Terran> list);
@@ -46,9 +46,7 @@ private :
     QList<TerranFaceFeature> featureList={};//缓存的员工人脸特征列表
     QList<Terran> visitorTerranList={};//缓存访客，每一次检测如果检测不到，则清理一次
     QList<TerranFaceFeature> visitorFeatureList={};//缓存访客人脸特征
-    HttpUtil *httpUtil;
-    bool downPicFromServer(QList<Terran> terranList,int downPicIndex=0);
-    void insertPicToDb(int terranId,QImage *image);
+
     void loadPicFeatureFromDb(QList<Terran> &terranList);
 };
 

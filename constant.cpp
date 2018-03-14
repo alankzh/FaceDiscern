@@ -22,4 +22,5 @@ const unsigned int MAIN_WIDGET_WIDTH=1920;
 
 const unsigned int MAIN_WIDGET_HEIGHT=1080;
 
+const unsigned int CLEAR_SIGN_CACHE_INTERVAL=60000;
 
