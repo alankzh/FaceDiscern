@@ -5,6 +5,7 @@ FaceDiscernThreadHelper::FaceDiscernThreadHelper(QObject *obj):QObject(obj)
 }
 
 FaceDiscernThreadHelper::~FaceDiscernThreadHelper(){
+    emit endThread();
     if(faceDiscern!=nullptr){
         delete faceDiscern;
         faceDiscern=nullptr;

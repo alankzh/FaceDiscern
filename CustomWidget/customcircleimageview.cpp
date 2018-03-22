@@ -7,17 +7,25 @@ CustomCircleImageView::CustomCircleImageView(QWidget *parent,int diameter):QWidg
     this->diameter=diameter;
     resize(diameter,diameter);
     setFixedSize(diameter,diameter);
-    backgroundPix=QPixmap(diameter,diameter);
-    backgroundPix.fill(QColor(0,0,0,0));//透明度为0
-    this->setMask(backgroundPix.createHeuristicMask());//先将窗口总体背景透明
+    backgroundPix=new QPixmap(diameter,diameter);
+    backgroundPix->fill(QColor(0,0,0,0));//透明度为0
+    this->setMask(backgroundPix->createHeuristicMask());//先将窗口总体背景透明
+}
+
+CustomCircleImageView::~CustomCircleImageView(){
+    if(backgroundPix!=nullptr){
+        delete backgroundPix;
+        backgroundPix=nullptr;
+    }
 }
 
 void CustomCircleImageView::paintEvent(QPaintEvent *event){
     Q_UNUSED(event);
-
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing, true);//抗锯齿
-    painter.drawPixmap(event->rect(),backgroundPix,event->rect());
+    if(backgroundPix!=nullptr){
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing, true);//抗锯齿
+        painter.drawPixmap(event->rect(),*backgroundPix,event->rect());
+    }
 }
 
 /**
@@ -47,9 +55,12 @@ void CustomCircleImageView::setBackground(QImage image){
     QImage scaledImage=rectImage.scaled(QSize(diameter,diameter),
                                         Qt::KeepAspectRatio,
                                         Qt::SmoothTransformation);
-
-    backgroundPix=QPixmap::fromImage(scaledImage);
-    setMask(backgroundPix.createHeuristicMask());
+    if(backgroundPix!=nullptr){
+        delete backgroundPix;
+        backgroundPix=nullptr;
+    }
+    backgroundPix=new QPixmap(QPixmap::fromImage(scaledImage));
+    setMask(backgroundPix->createHeuristicMask());
     update();
 }
 

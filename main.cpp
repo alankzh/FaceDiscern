@@ -16,7 +16,8 @@
 #include "CustomWidget/signinwidget.h"
 #include "CustomWidget/signgatherwidget.h"
 #include "CustomWidget/signbottomwidget.h"
-#include "facediscerntestwidget.h"
+
+//#include <vld.h>
 
 int main(int argc, char *argv[])
 {
@@ -29,11 +30,13 @@ int main(int argc, char *argv[])
     Constant::Read_Configuration();
 
 
-//    Widget w;//主界面
-//    w.show();
+    Widget w;//主界面
+    w.show();
 
-    Widget *w=new Widget();
-    w->show();
+//    Widget *w=new Widget();
+//    w->show();
+
+
 
     //    DBCTestWidget dbTest;// 数据库测试
     //    dbTest.show();

@@ -45,17 +45,18 @@ void SignGatherWidget::paintEvent(QPaintEvent *event){
 }
 
 void SignGatherWidget::terranSignIn(Terran terran, TerranSignInMessageWidget::LabelType labelType){
-        if(status==AnimatorStatus::End){
-            SignInWidget *signInWidgetNew=new SignInWidget(this);
-            signInWidgetNew->insertTerranInformation(terran,labelType);
-            signInWidgetNew->move(0,0);
-            signInWidgetNew->setWindowOpacity(0);//透明
-            signInWidgetNew->hide();
-            widgetList.append(signInWidgetNew);
-            startSignInAnimator();
-        }else{
-            needAnimatorList.append(terran);
-        }
+    if(status==AnimatorStatus::End){
+        //            SignInWidget *signInWidgetNew=new SignInWidget(this);
+        //            signInWidgetNew->insertTerranInformation(terran,labelType);
+        //            signInWidgetNew->move(0,0);
+        //            signInWidgetNew->setWindowOpacity(0);//透明
+        //            signInWidgetNew->hide();
+        //            widgetList.append(signInWidgetNew);
+        nowAnimatorTerran=terran;
+        startSignInAnimator();
+    }else{
+        needAnimatorList.append(terran);
+    }
 }
 
 void SignGatherWidget::signIn(Terran terran){
@@ -70,8 +71,8 @@ void SignGatherWidget::startSignInAnimator(){
     status=AnimatorStatus::Moving;
     QParallelAnimationGroup *animationGroup=new QParallelAnimationGroup;
     QEasingCurve easing(QEasingCurve::OutCirc);
-    /*除新加入的，在屏幕边缘的签到栏外，其余控件向下移动*/
-    for(int i=0;i<widgetList.size()-1;i++){
+    /*所有控件向下移动*/
+    for(int i=0;i<=widgetList.size()-1;i++){
         SignInWidget *signWidget=widgetList.at(i);
         QPropertyAnimation *animation=new QPropertyAnimation(signWidget,"geometry");
         animation->setDuration(1500);
@@ -89,12 +90,22 @@ void SignGatherWidget::startSignInAnimator(){
  * 签到动画第二段
  */
 void SignGatherWidget::animatorStageTwo(){
-    SignInWidget *insertWidget=widgetList.last();
+    /*第一个控件返回到最末*/
+    SignInWidget *insertWidget=widgetList.first();
+    widgetList.removeFirst();
+    widgetList.append(insertWidget);
+
+
     QPropertyAnimation *animation=new QPropertyAnimation(insertWidget,"windowOpacity");
     QEasingCurve easing(QEasingCurve::OutCirc);
     animation->setDuration(1500);
     animation->setStartValue(0);
     animation->setEndValue(1);
+
+    insertWidget->insertTerranInformation(nowAnimatorTerran);
+    insertWidget->move(0,0);
+    insertWidget->setWindowOpacity(0);//透明
+    insertWidget->hide();
     insertWidget->show();
     //    animation->setStartValue(insertWidget->geometry());
     //    animation->setEndValue(QRect(0,0,insertWidget->geometry().width(),insertWidget->geometry().height()));
@@ -109,21 +120,16 @@ void SignGatherWidget::animatorStageTwo(){
  */
 void SignGatherWidget::onMovingEnd(){
     widgetList.last()->show();
-    SignInWidget * lastWidget=widgetList.first();
-    delete lastWidget;
-    lastWidget=nullptr;
-    widgetList.removeFirst();//去掉第一个
+    //    SignInWidget * lastWidget=widgetList.first();
+    //    delete lastWidget;
+    //    lastWidget=nullptr;
+    //    widgetList.removeFirst();//去掉第一个
 
     status=AnimatorStatus::End;
     if(needAnimatorList.size()>0){
         Terran terran=needAnimatorList.at(0);
-        SignInWidget *signInWidgetNew=new SignInWidget(this);
-        signInWidgetNew->insertTerranInformation(terran);
-        signInWidgetNew->move(0,0);
-        signInWidgetNew->setWindowOpacity(0);//透明
-        signInWidgetNew->hide();
-        widgetList.append(signInWidgetNew);
         needAnimatorList.removeFirst();
+        nowAnimatorTerran=terran;
         startSignInAnimator();
     }
 }

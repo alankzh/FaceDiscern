@@ -18,7 +18,7 @@ class CustomCircleImageView:public QWidget
 {
 public:
     CustomCircleImageView(QWidget *parent=nullptr,int diameter=55);
-
+    ~CustomCircleImageView();
     void setBackground(QImage image);
     void setPos(int x,int y);
     void setSize(int width,int height);
@@ -42,7 +42,7 @@ public:
 protected:
     virtual void paintEvent(QPaintEvent *event);
 private:
-    QPixmap backgroundPix;
+    QPixmap *backgroundPix=nullptr;
     const int bigDiameter=1024;//øπæ‚≥›”√
     int xPos;
     int yPos;

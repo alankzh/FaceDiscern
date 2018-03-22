@@ -53,8 +53,7 @@ SOURCES += main.cpp\
     CustomWidget/signgatherwidget.cpp \
     CustomWidget/signbottomwidget.cpp \
     CustomWidget/signbottomleftwidget.cpp \
-    CustomWidget/signbottomrightwidget.cpp \
-    facediscerntestwidget.cpp
+    CustomWidget/signbottomrightwidget.cpp
 
 HEADERS  += widget.h \
     ArcFacePackage/amcomdef.h \
@@ -100,8 +99,7 @@ HEADERS  += widget.h \
     CustomWidget/signgatherwidget.h \
     CustomWidget/signbottomwidget.h \
     CustomWidget/signbottomleftwidget.h \
-    CustomWidget/signbottomrightwidget.h \
-    facediscerntestwidget.h
+    CustomWidget/signbottomrightwidget.h
 
 
 FORMS    += widget.ui

@@ -86,6 +86,17 @@ void Widget::init(){
 
     faceDiscernThreadHelper->startThread();//开始人脸识别线程
     heartBeatThreadHelper->startThread();//开始心跳线程
+
+
+    QPushButton *quitButton=new QPushButton(this);
+    quitButton->setGeometry(200,200,200,200);
+    quitButton->setText("QQQQuit");
+    connect(quitButton,SIGNAL(clicked(bool)),this,SLOT());
+    mainLayout->addWidget(quitButton);
+}
+
+void Widget::quitApplication(bool){
+    QApplication::quit();
 }
 
 void Widget::paintEvent(QPaintEvent *event){

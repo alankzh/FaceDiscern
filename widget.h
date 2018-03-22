@@ -28,6 +28,8 @@ private slots:
     void receiveDetectTerran(QList<Terran> terranList);//引擎传回的检测员工
 
     void errorDispose(QString str);
+
+    void quitApplication(bool);
 signals:
     void sendImageToFaceEngine(QImage &image);//发送截图到人脸识别引擎
 protected:

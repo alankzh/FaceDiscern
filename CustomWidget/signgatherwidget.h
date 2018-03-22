@@ -41,6 +41,7 @@ private:
     QList<SignInWidget*> widgetList={};//6个签到信息展示控件的队列，从队列末先进，从队列首先出
     QList<Terran> needAnimatorList={};//动画缓存
     const int Y_FALL=121;//(116+5) 往下坠落高度+间距
+    Terran nowAnimatorTerran;
 };
 
 #endif // SIGNGATHERWIDGET_H

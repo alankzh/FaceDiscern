@@ -7,6 +7,7 @@ HeartThreadHelper::HeartThreadHelper(QObject *obj):QObject(obj){
 }
 
 HeartThreadHelper::~HeartThreadHelper(){
+    emit endThread();
     if(heartbeat!=nullptr){
         delete heartbeat;
         heartbeat=nullptr;
