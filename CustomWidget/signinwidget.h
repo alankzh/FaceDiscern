@@ -33,6 +33,7 @@ private:
     QPixmap backgroundPix;
     TerranSignInMessageWidget *messageWidget;
     TerranSignInTimeWidget *timeWidget;
+    QHBoxLayout *mainLayout;
 };
 
 #endif // SIGNINWIDGET_H

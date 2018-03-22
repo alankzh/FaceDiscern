@@ -41,6 +41,8 @@ private:
     void selectDB(QSqlDatabase *sqldb,QList<Terran> &list);
     void selectDBWithId(QSqlDatabase *sqldb,QList<Terran> &list);
 
+    void clearSignType(QSqlDatabase *sqldb);
+
     void saveImage(QSqlDatabase *sqldb,QList<Terran> &list,QImage *image);
     void deleteImage(QSqlDatabase *sqldb,QList<Terran> &list);
     void updateImage(QSqlDatabase *sqldb,QList<Terran> &list,QImage *image);
@@ -54,6 +56,7 @@ public:
         UpdateDB,
         SelectDB,
         SelectDBWithId,
+        ClearSignType,
         SavaImage,
         DeleteImage,
         UpdateImage,

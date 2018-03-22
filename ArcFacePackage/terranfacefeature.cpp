@@ -7,7 +7,7 @@ TerranFaceFeature::TerranFaceFeature()
 }
 
 TerranFaceFeature::~TerranFaceFeature(){
-  //  qDebug()<<"TerranFaceFeature::~TerranFaceFeature and id:"<<id;
+//    qDebug()<<"TerranFaceFeature::~TerranFaceFeature and id:"<<id;
     if(frFaceModelFeature.pbFeature!=nullptr){
         std::free(frFaceModelFeature.pbFeature);
         frFaceModelFeature.pbFeature=nullptr;

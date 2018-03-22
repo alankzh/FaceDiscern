@@ -13,16 +13,16 @@ FaceDiscernTestWidget::FaceDiscernTestWidget(QWidget *parent):QWidget(parent)
 
 void FaceDiscernTestWidget::startPair(bool){
     int errorCode=0;
-    QImage xiaofang("E:\\xiaofang.jpg");
-    QImage meijie("E:\\meijie.jpg");
+    QImage xiaofang("E:\\2.png");
+    QImage meijie("E:\\3.jpg");
 
     //    LPAFT_FSDK_FACERES xiaofangFtRes=faceDiscern->FTEngineDiscern(xiaofang,errorCode);
 
     //    LPAFT_FSDK_FACERES meijieFtRes=faceDiscern->FTEngineDiscern(meijie,errorCode);
 
-    LPAFD_FSDK_FACERES xiaofangFtRes=faceDiscern->FDEngineDiscern(xiaofang,errorCode);
+    LPAFT_FSDK_FACERES xiaofangFtRes=faceDiscern->FTEngineDiscern(xiaofang,errorCode);
 
-    LPAFD_FSDK_FACERES meijieFtRes=faceDiscern->FDEngineDiscern(meijie,errorCode);
+    LPAFT_FSDK_FACERES meijieFtRes=faceDiscern->FTEngineDiscern(meijie,errorCode);
 
     TerranFaceFeature xiaofangFeature;
     AFR_FSDK_FACEINPUT xiaofangInput=faceDiscern->getFREngineFaceInput(xiaofangFtRes);

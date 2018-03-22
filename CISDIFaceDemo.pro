@@ -9,6 +9,7 @@ QT += multimedia multimediawidgets
 QT += network
 QT +=sql
 QT += winextras
+QT += xml
 
 CONFIG += c++11
 

@@ -13,6 +13,7 @@
 #include "customcameraviewfinder.h"
 #include "httputil.h"
 #include "constant.h"
+#include "DBC/sqldatabase.h"
 
 /**
  * @brief The CameraShowWidget class

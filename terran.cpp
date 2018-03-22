@@ -119,6 +119,8 @@ QString Terran::toString(){
     str.append(QString::number(this->typeOfWork));
     str.append(QString::fromLocal8Bit(" terran isUpdate:"));
     str.append(QString::number(this->isUpdate));
+    str.append(QString::fromLocal8Bit(" terran uglyType:"));
+    str.append(QString::number(this->uglyType));
 
     return str;
 }

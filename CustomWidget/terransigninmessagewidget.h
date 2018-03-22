@@ -18,6 +18,7 @@ class TerranSignInMessageWidget:public QWidget
 {
 public:
     TerranSignInMessageWidget(QWidget *parent=nullptr);
+    ~TerranSignInMessageWidget();
     const int width=570;
     const int height=116;
 
@@ -35,10 +36,11 @@ private:
     void init();
     QPixmap backgroundPix;
 
-    CustomCircleImageView *headerCircleImageView;
-    CustomTextView  *nameTextView;
-    CustomTextView *departmentTextView;
-    CustomImageView *signInLabelImageView;
+    CustomCircleImageView *headerCircleImageView=nullptr;
+    CustomTextView  *nameTextView=nullptr;
+    CustomTextView *departmentTextView=nullptr;
+    CustomImageView *signInLabelImageView=nullptr;
+    QHBoxLayout *mainLayout=nullptr;
 };
 
 #endif // TERRANSIGNINMESSAGEWIDGET_H

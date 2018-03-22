@@ -126,8 +126,6 @@ QString* HttpUtil::downMessage(QString url){
  * 异步方式发送消息
  */
 void HttpUtil::sendMessage(QString url){
-    QString* message=nullptr;
-
     QNetworkRequest request;
     request.setUrl(url);
 
@@ -137,7 +135,7 @@ void HttpUtil::sendMessage(QString url){
 }
 
 void HttpUtil::asynHttpFinished(){
-    qDebug()<<"HeartBeat::httpFinishedSlot";
+//    qDebug()<<"HttpUtil::asynHttpFinished";
     if (asynNetReply->error() == QNetworkReply::NoError){
         //链接完毕后能读取到全部数据
         QByteArray byteArray=asynNetReply->readAll();
@@ -151,5 +149,7 @@ void HttpUtil::asynHttpFinished(){
         //statusCodeV.toInt()为0时表示网络故障
         qDebug(qPrintable(asynNetReply->errorString()));
     }
-    asynNetReply->deleteLater();
+    asynNetReply->abort();
+    delete asynNetReply;
+    asynNetReply=nullptr;
 }

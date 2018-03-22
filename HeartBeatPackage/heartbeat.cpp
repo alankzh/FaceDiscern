@@ -26,7 +26,7 @@ HeartBeat::~HeartBeat(){
  */
 void HeartBeat::beat(){
     QNetworkRequest request;
-    request.setUrl(HEART_BEAT_URL);
+    request.setUrl(Constant::HEART_BEAT_URL);
 
     netReply=netManager->get(request);
 //    connect(netReply, SIGNAL(readyRead()), this, SLOT(readFromResponse()));//准备读取，然后并不能读到全部数据
@@ -60,7 +60,7 @@ void HeartBeat::beat(){
  * @param reply
  */
 void HeartBeat::httpFinishedSlot(QNetworkReply *reply){
-    qDebug()<<"HeartBeat::httpFinishedSlot";
+//    qDebug()<<"HeartBeat::httpFinishedSlot";
     if (reply->error() == QNetworkReply::NoError){
         //链接完毕后能读取到全部数据
         QByteArray byteArray=netReply->readAll();

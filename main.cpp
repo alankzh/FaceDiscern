@@ -26,14 +26,20 @@ int main(int argc, char *argv[])
     qRegisterMetaType<Terran>("Terran");
     qRegisterMetaType<QImage>("QImage&");
 
-        Widget w;//主界面
-        w.show();
+    Constant::Read_Configuration();
 
-//    DBCTestWidget dbTest;// 数据库测试
-//    dbTest.show();
 
-    //    FaceDiscernTestWidget faceDiscernWidget; //人脸对比测试
-    //    faceDiscernWidget.show();
+//    Widget w;//主界面
+//    w.show();
+
+    Widget *w=new Widget();
+    w->show();
+
+    //    DBCTestWidget dbTest;// 数据库测试
+    //    dbTest.show();
+
+//        FaceDiscernTestWidget faceDiscernWidget; //人脸对比测试
+//        faceDiscernWidget.show();
 
     return a.exec();
 }

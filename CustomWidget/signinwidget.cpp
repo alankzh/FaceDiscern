@@ -5,6 +5,18 @@ SignInWidget::SignInWidget(QWidget *parent):QWidget(parent){
 }
 
 SignInWidget::~SignInWidget(){
+    if(messageWidget!=nullptr){
+        delete messageWidget;
+        messageWidget=nullptr;
+    }
+    if(timeWidget!=nullptr){
+        delete timeWidget;
+        timeWidget=nullptr;
+    }
+    if(mainLayout!=nullptr){
+        delete mainLayout;
+        mainLayout=nullptr;
+    }
 }
 
 void SignInWidget::init(){
@@ -15,7 +27,7 @@ void SignInWidget::init(){
     backgroundPix.fill(QColor(255,255,255,0));
     this->setMask(backgroundPix.createHeuristicMask());//总体背景为透明度0%
 
-    QHBoxLayout *mainLayout=new QHBoxLayout();
+    mainLayout=new QHBoxLayout();
     mainLayout->setContentsMargins(0,0,0,0);
     mainLayout->setSpacing(1);
 
@@ -35,13 +47,14 @@ void SignInWidget::paintEvent(QPaintEvent *event){
 
 void SignInWidget::insertTerranInformation(Terran terran, TerranSignInMessageWidget::LabelType labelType){
     this->id=terran.id;
-    QImage image;
+    QImage *image=new QImage();
     QList<Terran> list={};
     list.append(terran);
     SQLDataBase::instance()->connectionDB(UI_DB_CONNECTION_NAME);
-    SQLDataBase::instance()->operationDB(UI_DB_CONNECTION_NAME,SQLDataBase::OperationWay::LoadDBImage,list,&image);
-    qDebug()<<terran.department;
-    messageWidget->loadData(image,terran.name,terran.department,labelType);
+    SQLDataBase::instance()->operationDB(UI_DB_CONNECTION_NAME,SQLDataBase::OperationWay::LoadDBImage,list,image);
+
+    messageWidget->loadData(*image,terran.name,terran.department,labelType);
+    delete image;
     timeWidget->setTimeAndDate();
 }
 

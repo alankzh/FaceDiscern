@@ -127,7 +127,7 @@ void CustomCameraViewFinder::onDisappearAnimatorEnd(int terranId){
             iter.remove();
         }
     }
-
+    qDebug()<<faceRectList.size();
 }
 
 /**

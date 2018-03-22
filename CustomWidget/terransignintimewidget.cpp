@@ -4,6 +4,20 @@ TerranSignInTimeWidget::TerranSignInTimeWidget(QWidget *parent):QWidget(parent){
     init();
 }
 
+TerranSignInTimeWidget::~TerranSignInTimeWidget(){
+    if(timeTextView!=nullptr){
+        delete timeTextView;
+        timeTextView=nullptr;
+    }
+    if(dateTextVoew!=nullptr){
+        delete dateTextVoew;
+        dateTextVoew=nullptr;
+    }
+    if(mainLayout!=nullptr){
+        delete mainLayout;
+        mainLayout=nullptr;
+    }
+}
 
 void TerranSignInTimeWidget::paintEvent(QPaintEvent *event){
     Q_UNUSED(event);
@@ -18,7 +32,7 @@ void TerranSignInTimeWidget::init(){
     backgroundPix.fill(QColor(0,0,0,102));
     this->setMask(backgroundPix.createHeuristicMask());//总体背景为透明度40%
 
-    QVBoxLayout *mainLayout=new QVBoxLayout();
+    mainLayout=new QVBoxLayout();
     mainLayout->setContentsMargins(10,30,10,10);
     mainLayout->setSpacing(10);
 

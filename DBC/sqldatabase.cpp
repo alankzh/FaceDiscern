@@ -61,15 +61,13 @@ bool SQLDataBase::connectionDB(QString connectionName){
     if(!list.contains(FACE_TABLE_NAME)){
         QSqlQuery sqlQuery(*sqlDB);
 
-        QString createTable="create table terran (id int,name text,openId text,photoUrl text,position text,faceToken text,departmentId int,department text,begTime text,endTime text,date text,typeOfwork bool,isUpdate bool)";
+        QString createTable="create table terran (id int primary key,name text,openId text,photoUrl text,position text,faceToken text,departmentId int,department text,begTime text,endTime text,date text,typeOfwork bool,isUpdate bool,uglyType int)";
 
         sqlQuery.prepare(createTable);
-        if(!sqlQuery.exec())
-        {
+        if(!sqlQuery.exec()){
             qDebug()<<sqlQuery.lastError();
         }
-        else
-        {
+        else{
             qDebug()<<"table created!";
         }
 
@@ -82,12 +80,10 @@ bool SQLDataBase::connectionDB(QString connectionName){
         QString createTable="create table terranImageData (id int primary key,imageData blob)";
 
         sqlQuery.prepare(createTable);
-        if(!sqlQuery.exec())
-        {
+        if(!sqlQuery.exec()){
             qDebug()<<sqlQuery.lastError();
         }
-        else
-        {
+        else{
             qDebug()<<"table created!";
         }
 
@@ -142,6 +138,9 @@ bool SQLDataBase::operationDB(QString connectionName, SQLDataBase::OperationWay 
     case OperationWay::SelectDBWithId:
         selectDBWithId(dbMap[connectionName],list);
         break;
+    case OperationWay::ClearSignType:
+        clearSignType(dbMap[connectionName]);
+        break;
     case OperationWay::SavaImage:
         saveImage(dbMap[connectionName],list,image);
         break;
@@ -163,7 +162,7 @@ bool SQLDataBase::operationDB(QString connectionName, SQLDataBase::OperationWay 
 void SQLDataBase::insertDB(QSqlDatabase *sqldb, QList<Terran> &list){
     sqldb->transaction();//开始事务，批量提交更有效率
 
-    QString sqlStr = "insert into terran values (:id,:name,:openId,:photoUrl,:position,:faceToken,:departmentId,:department,:begTime,:endTime,:date,:typeOfwork,:isUpdate)";
+    QString sqlStr = "insert into terran values (:id,:name,:openId,:photoUrl,:position,:faceToken,:departmentId,:department,:begTime,:endTime,:date,:typeOfwork,:isUpdate,:uglyType)";
     QSqlQuery sqlQuery(*sqldb);
 
     bool success=false;
@@ -182,6 +181,8 @@ void SQLDataBase::insertDB(QSqlDatabase *sqldb, QList<Terran> &list){
         sqlQuery.bindValue(":date",terran.date);
         sqlQuery.bindValue(":typeOfwork",terran.typeOfWork);
         sqlQuery.bindValue(":isUpdate",terran.isUpdate);
+        sqlQuery.bindValue(":uglyType",terran.uglyType);
+
 
         success=sqlQuery.exec();
         if(!success){
@@ -224,7 +225,7 @@ void SQLDataBase::deleteDB(QSqlDatabase *sqldb, QList<Terran> &list){
 void SQLDataBase::updateDB(QSqlDatabase *sqldb, QList<Terran> &list){
     sqldb->transaction();//开始事务，批量提交更有效率
 
-    QString sqlStr="update terran set name=:name,openId=:openId,photoUrl=:photoUrl,position=:position,faceToken=:faceToken,departmentID=:departmentId,department=:department,begTime=:begTime,endTime=:endTime,date=:date,typeOfwork=:typeOfwork,isUpdate=:isUpdate where id = :id";
+    QString sqlStr="update terran set name=:name,openId=:openId,photoUrl=:photoUrl,position=:position,faceToken=:faceToken,departmentID=:departmentId,department=:department,begTime=:begTime,endTime=:endTime,date=:date,typeOfwork=:typeOfwork,isUpdate=:isUpdate,uglyType=:uglyType where id = :id";
 
     QSqlQuery sqlQuery(*sqldb);
     bool success=false;
@@ -241,10 +242,8 @@ void SQLDataBase::updateDB(QSqlDatabase *sqldb, QList<Terran> &list){
         sqlQuery.bindValue(":endTime",terran.endTime);
         sqlQuery.bindValue(":date",terran.date);
         sqlQuery.bindValue(":typeOfwork",terran.typeOfWork);
-
-        qDebug()<<QString::fromLocal8Bit("更新:")<<terran.typeOfWork;
-
         sqlQuery.bindValue(":isUpdate",terran.isUpdate);
+        sqlQuery.bindValue(":uglyType",terran.uglyType);
         sqlQuery.bindValue(":id",terran.id);
 
         success=sqlQuery.exec();
@@ -284,6 +283,7 @@ void SQLDataBase::selectDB(QSqlDatabase *sqldb,QList<Terran> &list){
             terran.date=sqlQuery.value("date").toString();
             terran.typeOfWork=sqlQuery.value("typeOfwork").toBool();
             terran.isUpdate=sqlQuery.value("isUpdate").toBool();
+            terran.uglyType=sqlQuery.value("uglyType").toInt();
 
             list.append(terran);
         }
@@ -326,8 +326,7 @@ void SQLDataBase::selectDBWithId(QSqlDatabase *sqldb, QList<Terran> &list){
                 terran.date=sqlQuery.value("date").toString();
                 terran.typeOfWork=sqlQuery.value("typeOfwork").toBool();
                 terran.isUpdate=sqlQuery.value("isUpdate").toBool();
-
-                qDebug()<<"111111:"<<sqlQuery.value("typeOfwork").toBool();
+                terran.uglyType=sqlQuery.value("uglyType").toInt();
 
                 readlist.append(terran);
             }
@@ -336,6 +335,31 @@ void SQLDataBase::selectDBWithId(QSqlDatabase *sqldb, QList<Terran> &list){
 
     list.clear();
     list=readlist;
+}
+
+/**
+ * @brief SQLDataBase::clearSignType
+ * 0点，清空一切已签到
+ * @param sqldb
+ */
+void SQLDataBase::clearSignType(QSqlDatabase *sqldb){
+    sqldb->transaction();//开始事务，批量提交更有效率
+    QString sqlStr="update terran set uglyType=:uglyType";
+    QSqlQuery sqlQuery(*sqldb);
+
+    sqlQuery.prepare(sqlStr);
+    sqlQuery.bindValue(":uglyType",1);
+
+    bool success=false;
+    success=sqlQuery.exec();
+    if(!success){
+        //对于更新而言，一条语句失败就失败了，不必回滚全部
+        //            sqldb->rollback();//回滚
+        qDebug()<<"清空失败,"<<sqlQuery.lastError();
+    }else{
+    }
+
+    sqldb->commit();
 }
 
 void SQLDataBase::saveImage(QSqlDatabase *sqldb, QList<Terran> &list, QImage *image){

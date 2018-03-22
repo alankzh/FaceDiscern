@@ -35,7 +35,7 @@ void HeartThreadHelper::startThread(){
  * 线程开始时，初始化环境
  */
 void HeartThreadHelper::environmentInit(){
-    qDebug()<<(int)QThread::currentThreadId();
+    qDebug()<<QString::fromLocal8Bit("当前线程id:")<<(int)QThread::currentThreadId();
     heartbeat=new HeartBeat();
     connect(heartbeat,SIGNAL(receiveResponseStr(QString&)),this,SLOT(receiveTerrans(QString&)));
     connect(heartbeat,SIGNAL(httpError(int)),this,SLOT(httpErrorInHeart(int)));
@@ -49,7 +49,7 @@ void HeartThreadHelper::environmentInit(){
     terranList={};
     SQLDataBase::instance()->operationDB(HEART_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDB,terranList);
 
-    qDebug()<<QString::fromLocal8Bit("加载数据库中数据到缓存,缓存数据长度:")<<terranList.size();
+//    qDebug()<<QString::fromLocal8Bit("加载数据库中数据到缓存,缓存数据长度:")<<terranList.size();
 
     heartbeat->beat();//开始心跳
 }
@@ -132,20 +132,8 @@ void HeartThreadHelper::heartBeatDelay(int mesc){
  * @param listFromServer
  */
 void HeartThreadHelper::synchronizationData(QList<Terran> &listFromServer){
-    qDebug()<<terranList.size();
-    qDebug()<<listFromServer.size();
-
-    for(Terran terran:terranList){
-        if(terran.id==92){
-            qDebug()<<"local:"<<terran.id;
-        }
-    }
-
-    for(Terran terran:listFromServer){
-        if(terran.id==92){
-            qDebug()<<"server:"<<terran.id;
-        }
-    }
+//    qDebug()<<terranList.size();
+//    qDebug()<<listFromServer.size();
 
     //保证服务器上数据的次序，一般可省略，因为服务器上的次序一般是按照id从小到大排列的
     Terran::quickSort(listFromServer,0,listFromServer.size()-1);
@@ -208,7 +196,6 @@ void HeartThreadHelper::synchronizationData(QList<Terran> &listFromServer){
         }
     }
 
-
     if(insertList.size()>0){
         SQLDataBase::instance()->operationDB(HEART_DB_CONNECTION_NAME,SQLDataBase::OperationWay::InsertDB,insertList);
         downAndInsertImageToDB(insertList);
@@ -237,7 +224,7 @@ void HeartThreadHelper::synchronizationData(QList<Terran> &listFromServer){
     }
 
     if(insertList.size()==0&&deleteList.size()==0&&updateList.size()==0){
-        qDebug()<<QString::fromLocal8Bit("与服务器上数据一致，不需要同步");
+//        qDebug()<<QString::fromLocal8Bit("与服务器上数据一致，不需要同步");
     }else{
         //重新查找数据库中全部数据，加入缓存，
         //用数据库查找的，而不是内存中的数据，以确保数据库操作后的一致性，以防操作失败
@@ -251,7 +238,7 @@ void HeartThreadHelper::synchronizationData(QList<Terran> &listFromServer){
 
 void HeartThreadHelper::downAndInsertImageToDB(QList<Terran> &list){
     for(Terran needDownterran:list){
-        QString url=DOWNLOAD_PIC_URL_PRE+needDownterran.photoUrl;
+        QString url=Constant::DOWNLOAD_PIC_URL_PRE+needDownterran.photoUrl;
         QImage* image;
         image=httpUtil->downLoadPic(url);//同步方式在下载
 

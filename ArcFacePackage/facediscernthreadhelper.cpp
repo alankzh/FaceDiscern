@@ -68,90 +68,108 @@ void FaceDiscernThreadHelper::receiveCaptureImage(QImage &image){
         errorCatch(errorCode,FaceDiscern::FailedType::FaceTrackingFailed);
     }else{
 
-        QList<Terran> selectList={};
-        QList<Terran> selectVisitorList={};
-        QList<TerranFaceFeature> selectVisitorFeatureList={};
-        int faceNum=ftFaceRes->nFace;
-        TerranFaceFeature xiaofang;
-        TerranFaceFeature meijie;
-        for(int i=0;i<faceNum;i++){
-            TerranFaceFeature terranFaceFeature;
-            AFR_FSDK_FACEINPUT frInput=faceDiscern->getFREngineFaceInput(ftFaceRes,i);
-            terranFaceFeature.frFaceModelFeature=faceDiscern->FREngineExtractFaceFeature(scaledImage,frInput,errorCode);
-            bool isEmployee=false;
-            for(TerranFaceFeature cacheTerranFaceFeature:featureList){
-                float similarity=0.0;
-                similarity=faceDiscern->FREngineCompareFaceFeature(&(cacheTerranFaceFeature.frFaceModelFeature),&(terranFaceFeature.frFaceModelFeature),errorCode);
-                if(errorCode!=MOK){
-                    errorCatch(errorCode,FaceDiscern::FailedType::FacePairMatchFailed);
-                }else{
-                    if(similarity>=0.6){
-                        //是员工
-                        qDebug()<<"is Employ";
-                        Terran terran;
-                        terran.id=cacheTerranFaceFeature.id;
-                        QList<Terran> list={};
-                        list.append(terran);
-                        SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDBWithId,list);
-                        Terran terran2=list.first();
-                        terran2.frFaceInput=frInput;//加上人脸矩形
-                        selectList.append(terran2);
-                        isEmployee=true;
-                        break;
-                    }
-                }
-            }
+//        int faceNum=ftFaceRes->nFace;
+//        QList<Terran> terranList={};
+//        for(int i=0;i<faceNum;i++){
+//            AFR_FSDK_FACEINPUT frInput=faceDiscern->getFREngineFaceInput(ftFaceRes,i);
+//            Terran terran;
+//            terran.id=-1;
+//            terran.frFaceInput=frInput;
+//            terranList.append(terran);
+//        }
+//        emit sendTerran(terranList);
 
-            if(!isEmployee){
-                bool isCacheVisitor=false;
-                for(TerranFaceFeature cacheVisitorFeature:visitorFeatureList){
-                    float similarity=0.0;
-                    similarity=faceDiscern->FREngineCompareFaceFeature(&(cacheVisitorFeature.frFaceModelFeature),&(terranFaceFeature.frFaceModelFeature),errorCode);
-                    //                    qDebug()<<QString::fromLocal8Bit("与缓存访客相似度 similarity:")<<similarity;
-                    if(errorCode!=MOK){
-                        errorCatch(errorCode,FaceDiscern::FailedType::FacePairMatchFailed);
-                    }else{
-                        if(similarity>=0.6){
-                            //同一个人，旧访客
-                            qDebug()<<QString::fromLocal8Bit("旧访客");
-                            Terran terran;
-                            terran.id=cacheVisitorFeature.id;
-                            terran.frFaceInput=frInput;//加上人脸矩形
-                            isCacheVisitor=true;
+                QList<Terran> selectList={};
+                QList<Terran> selectVisitorList={};
+                QList<TerranFaceFeature> selectVisitorFeatureList={};
 
-                            selectVisitorList.append(terran);//因为id从小到大排列，故越后的terranid越大，加在队列末尾
-                            terranFaceFeature.id= terran.id;
-                            break;
+                int faceNum=ftFaceRes->nFace;
+                for(int i=0;i<faceNum;i++){
+                    TerranFaceFeature terranFaceFeature;
+                    AFR_FSDK_FACEINPUT frInput=faceDiscern->getFREngineFaceInput(ftFaceRes,i);
+                    terranFaceFeature.frFaceModelFeature=faceDiscern->FREngineExtractFaceFeature(scaledImage,frInput,errorCode);
+                    bool isEmployee=false;
+                    for(TerranFaceFeature cacheTerranFaceFeature:featureList){
+                        float similarity=0.0;
+                        similarity=faceDiscern->FREngineCompareFaceFeature(&(cacheTerranFaceFeature.frFaceModelFeature),&(terranFaceFeature.frFaceModelFeature),errorCode);
+                        if(errorCode!=MOK){
+                            errorCatch(errorCode,FaceDiscern::FailedType::FacePairMatchFailed);
                         }else{
-                            QImage faceImg=image.copy(ftFaceRes->rcFace[i].left,ftFaceRes->rcFace[i].top,ftFaceRes->rcFace[i].right-ftFaceRes->rcFace[i].left,ftFaceRes->rcFace[i].bottom-ftFaceRes->rcFace[i].top);
-                            //    TODO                        faceImg.save("E:\\visitornew.jpg");
+                            if(similarity>=0.6){
+                                //是员工
+        //                        qDebug()<<"is Employ";
+                                Terran terran;
+                                terran.id=cacheTerranFaceFeature.id;
+                                QList<Terran> list={};
+                                list.append(terran);
+                                SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDBWithId,list);
+                                Terran terran2=list.first();
+                                terran2.frFaceInput=frInput;//加上人脸矩形
+                                selectList.append(terran2);
+                                isEmployee=true;
+
+                                if(Constant::SAVE_DISCERN){
+                                    QImage faceImg=scaledImage.copy(ftFaceRes->rcFace[i].left,ftFaceRes->rcFace[i].top,ftFaceRes->rcFace[i].right-ftFaceRes->rcFace[i].left,ftFaceRes->rcFace[i].bottom-ftFaceRes->rcFace[i].top);
+                                    faceImg.save(DIRPATH_DISCERN_TERRAN+terran2.name+QString::fromLocal8Bit(".jpg"),"JPG");
+        //                            qDebug()<<DIRPATH_DISCERN_TERRAN+terran2.name+QString::fromLocal8Bit(".jpg");
+                                }
+                                break;
+                            }
                         }
                     }
+
+                    if(!isEmployee){
+                        bool isCacheVisitor=false;
+                        for(TerranFaceFeature cacheVisitorFeature:visitorFeatureList){
+                            float similarity=0.0;
+                            similarity=faceDiscern->FREngineCompareFaceFeature(&(cacheVisitorFeature.frFaceModelFeature),&(terranFaceFeature.frFaceModelFeature),errorCode);
+                            //                    qDebug()<<QString::fromLocal8Bit("与缓存访客相似度 similarity:")<<similarity;
+                            if(errorCode!=MOK){
+                                errorCatch(errorCode,FaceDiscern::FailedType::FacePairMatchFailed);
+                            }else{
+                                if(similarity>=0.6){
+                                    //同一个人，旧访客
+                                    qDebug()<<QString::fromLocal8Bit("旧访客");
+                                    Terran terran;
+                                    terran.id=cacheVisitorFeature.id;
+                                    terran.frFaceInput=frInput;//加上人脸矩形
+                                    isCacheVisitor=true;
+
+                                    selectVisitorList.append(terran);//因为id从小到大排列，故越后的terranid越大，加在队列末尾
+                                    terranFaceFeature.id= terran.id;
+                                    break;
+                                }else{
+                                    //                            QImage faceImg=image.copy(ftFaceRes->rcFace[i].left,ftFaceRes->rcFace[i].top,ftFaceRes->rcFace[i].right-ftFaceRes->rcFace[i].left,ftFaceRes->rcFace[i].bottom-ftFaceRes->rcFace[i].top);
+                                    //    TODO                        faceImg.save("E:\\visitornew.jpg");
+                                }
+                            }
+                        }
+
+                        if(!isCacheVisitor){
+                            //没有访客缓存，新访客
+                            qDebug()<<QString::fromLocal8Bit("新访客");
+                            Terran terran;
+                            terran.frFaceInput=frInput;
+                            terran.id=Visitor_Offsert_Id_static;
+                            Visitor_Offsert_Id_static-=1;//每次有访客在其最小id基础上减1
+                            terranFaceFeature.id= terran.id;
+                            selectVisitorList.prepend(terran);//新产生的访客id最小，放最前
+                        }
+                        selectVisitorFeatureList.append(terranFaceFeature);
+                    }
+
                 }
 
-                if(!isCacheVisitor){
-                    //没有访客缓存，新访客
-                    qDebug()<<QString::fromLocal8Bit("新访客");
-                    Terran terran;
-                    terran.frFaceInput=frInput;
-                    terran.id=Visitor_Offsert_Id_static;
-                    Visitor_Offsert_Id_static-=1;//每次有访客在其最小id基础上减1
-                    terranFaceFeature.id= terran.id;
-                    selectVisitorList.prepend(terran);//新产生的访客id最小，放最前
-                }
-                selectVisitorFeatureList.append(terranFaceFeature);
-            }
-        }
+                visitorTerranList.clear();
+                visitorTerranList=selectVisitorList;
 
-        visitorTerranList.clear();
-        visitorTerranList=selectVisitorList;
-        visitorFeatureList.clear();
-        visitorFeatureList=selectVisitorFeatureList;
+                visitorFeatureList.clear();
+                visitorFeatureList=selectVisitorFeatureList;
 
-        ////        SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDBWithId,selectList);
-        selectList.append(selectVisitorList);
+                ////        SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDBWithId,selectList);
+                selectList.append(selectVisitorList);
 
-        emit sendTerran(selectList);//发送此帧检测到的人脸数据
+                emit sendTerran(selectList);//发送此帧检测到的人脸数据
 
         //引擎传回来的Rect包含left、right、top、right，分别表示矩形最左边距离x为0点距离、最右边距离x为0点距离、最上边距离y为0点距离、最底边距离y为0点距离
         //qt中Rect的表示有2种，其中一种为x、y、width、height，表示左上角x坐标、左上角y坐标、矩形宽、矩形高
@@ -161,7 +179,7 @@ void FaceDiscernThreadHelper::receiveCaptureImage(QImage &image){
     }
     //200ms后再次请求主线程发送截图过来
     QTimer::singleShot(SCREEN_SHOT_CIRCLE,this,SLOT(requestScreenShot()));
-//        QTimer::singleShot(0,this,SLOT(requestScreenShot()));
+//            QTimer::singleShot(0,this,SLOT(requestScreenShot()));
 }
 
 /**

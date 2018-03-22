@@ -79,6 +79,14 @@ void SystemLogoWidget::updateTime(){
     int nowMsec=currentQtime.msecsSinceStartOfDay();
     if(nowMsec<=5000){
         emit clearTerranSignNum();//每日0点，清空签到人数
+
+        system("shutdown -r -t 0");//重启
+
+        /*清空是否第一次签到*/
+        QList<Terran> list={};
+        SQLDataBase::instance()->operationDB(UI_DB_CONNECTION_NAME,SQLDataBase::OperationWay::ClearSignType,list);
+
+        system("shutdown -r -t 0");//重启
     }
 
     QDateTime dateTime =QDateTime::currentDateTime();

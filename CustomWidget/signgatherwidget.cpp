@@ -109,7 +109,11 @@ void SignGatherWidget::animatorStageTwo(){
  */
 void SignGatherWidget::onMovingEnd(){
     widgetList.last()->show();
+    SignInWidget * lastWidget=widgetList.first();
+    delete lastWidget;
+    lastWidget=nullptr;
     widgetList.removeFirst();//去掉第一个
+
     status=AnimatorStatus::End;
     if(needAnimatorList.size()>0){
         Terran terran=needAnimatorList.at(0);

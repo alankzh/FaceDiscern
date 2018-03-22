@@ -28,6 +28,7 @@ public:
     QString date;
     bool typeOfWork=false;
     bool isUpdate=false;//update更名为isUpdate，原名与数据库关键字冲突
+    int uglyType=1;//服务器上没有字段，本地用来判断是否今天第一次签到
 
     bool equals(Terran &terran);
     bool ServerDataequals(Terran &terran);

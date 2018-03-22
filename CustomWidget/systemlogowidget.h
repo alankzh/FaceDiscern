@@ -7,6 +7,7 @@
 #include "constant.h"
 #include "CustomWidget/customtextview.h"
 #include <QTimer>
+#include "DBC/sqldatabase.h"
 
 /**
  * @brief The SystemLogoWidget class

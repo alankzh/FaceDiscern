@@ -130,9 +130,9 @@ LPAFT_FSDK_FACERES FaceDiscern::FTEngineDiscern(QImage &image, int &resultCode){
         std::free(offInput.ppu8Plane[0]);
         return FaceRes;
     }  else  {
-        qDebug()<<QString::fromLocal8Bit("FT 识别成功");
+//        qDebug()<<QString::fromLocal8Bit("FT 识别成功");
         for (int i = 0; i < FaceRes->nFace; ++i){
-            qDebug()<<"face num:"<<i+1<<" left:"<<FaceRes->rcFace[i].left<<" top:"<<FaceRes->rcFace[i].top<<" right:"<<FaceRes->rcFace[i].right<<" bottom:"<<FaceRes->rcFace[i].bottom<<" orientation:"<<FaceRes->lfaceOrient<<"\n";
+//            qDebug()<<"face num:"<<i+1<<" left:"<<FaceRes->rcFace[i].left<<" top:"<<FaceRes->rcFace[i].top<<" right:"<<FaceRes->rcFace[i].right<<" bottom:"<<FaceRes->rcFace[i].bottom<<" orientation:"<<FaceRes->lfaceOrient<<"\n";
         }
     }
 

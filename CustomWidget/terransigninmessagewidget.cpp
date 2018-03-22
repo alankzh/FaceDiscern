@@ -5,6 +5,29 @@ TerranSignInMessageWidget::TerranSignInMessageWidget(QWidget *parent):QWidget(pa
     init();
 }
 
+TerranSignInMessageWidget::~TerranSignInMessageWidget(){
+    if(headerCircleImageView!=nullptr){
+        delete headerCircleImageView;
+        headerCircleImageView=nullptr;
+    }
+    if(nameTextView!=nullptr){
+        delete nameTextView;
+        nameTextView=nullptr;
+    }
+    if(departmentTextView!=nullptr){
+        delete departmentTextView;
+        departmentTextView=nullptr;
+    }
+    if(signInLabelImageView!=nullptr){
+        delete signInLabelImageView;
+        signInLabelImageView=nullptr;
+    }
+    if(mainLayout!=nullptr){
+        delete mainLayout;
+        mainLayout=nullptr;
+    }
+}
+
 void TerranSignInMessageWidget::init(){
     resize(width,height);
     setFixedSize(width,height);
@@ -19,7 +42,7 @@ void TerranSignInMessageWidget::init(){
  */
 void TerranSignInMessageWidget::loadData(QImage headerImage,QString name,QString department,TerranSignInMessageWidget::LabelType labelType){
 
-    QHBoxLayout *mainLayout=new QHBoxLayout();
+    mainLayout=new QHBoxLayout();
     mainLayout->setContentsMargins(35,10,30,10);
     mainLayout->setSpacing(38);
 

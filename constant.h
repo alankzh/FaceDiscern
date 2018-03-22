@@ -6,21 +6,40 @@
 #include <QPalette>
 #include <QColor>
 #include <QDir>
+#include <QDomDocument>
+#include <QDebug>
+#include <QVariant>
 
 /**
  *定义了一系列软件中使用的常量
  *分为.h和.cpp文件，而不是一个单独的.h文件。
  * 这是为了节省那微不足道的内存空间
 */
+class Constant:public QObject{
+    Q_OBJECT
+public:
+    static QString SERVER_URL;
 
-//获取全部人员信息的url
-extern const QString HEART_BEAT_URL;
+    static QString HEART_BEAT_URL;
 
-//下载图片的Url地址头
-extern const QString DOWNLOAD_PIC_URL_PRE;
+    static QString DOWNLOAD_PIC_URL_PRE;
 
-//发送签到信息的Url地址头
-extern const QString SEND_SIGN_IN_MESSAGE_URL;
+    static QString SEND_SIGN_IN_MESSAGE_URL;
+
+    static bool SAVE_DISCERN;
+
+    static void Read_Configuration();
+};
+
+
+////获取全部人员信息的url
+//extern const QString HEART_BEAT_URL;
+
+////下载图片的Url地址头
+//extern const QString DOWNLOAD_PIC_URL_PRE;
+
+////发送签到信息的Url地址头
+//extern const QString SEND_SIGN_IN_MESSAGE_URL;
 
 //face线程数据库连接，连接名
 extern const QString FACE_DB_CONNECTION_NAME;
@@ -50,6 +69,9 @@ static int Visitor_Offsert_Id_static=-1;
 
 //QImage文件的临时暂存点
 #define DIRPATH_QIMAGE_TEMPORARY (QDir::currentPath()+QString::fromLocal8Bit("/buff.jpg"))
+
+//识别到的员工脸的临时保存点
+#define DIRPATH_DISCERN_TERRAN (QDir::currentPath()+QString::fromLocal8Bit("/discern/"))
 
 class FontSetting{
 public:

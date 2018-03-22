@@ -14,6 +14,14 @@ Widget::Widget(QWidget *parent) :
 }
 
 Widget::~Widget(){
+    if(heartBeatThreadHelper!=nullptr){
+        heartBeatThreadHelper->deleteLater();
+        heartBeatThreadHelper=nullptr;
+    }
+    if(faceDiscernThreadHelper!=nullptr){
+        faceDiscernThreadHelper->deleteLater();
+        faceDiscernThreadHelper=nullptr;
+    }
 }
 
 
