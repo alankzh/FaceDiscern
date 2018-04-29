@@ -47,6 +47,12 @@ bool ConvertImage::readBmp24(QImage &screenShot, uint8_t **imageData, int *pWidt
                 memcpy((*imageData) + i * (*pWidth) * 3 + j * 3, data + i * (*pWidth)*4 + j * 4 + 1, 3);
             }
         }
+    }else if(screenShot.format()==QImage::Format_RGB888){
+        for (int i = 0; i < *pHeight; i++)   {
+            for (int j = 0; j < *pWidth; j++)    {
+                memcpy((*imageData) + i * (*pWidth) * 3 + j * 3, data + i * (*pWidth)*3 + j * 3 + 1, 3);
+            }
+        }
     }else{
        qDebug()<<QString::fromLocal8Bit("ͼƬ��ʽΪ:")<<(int)screenShot.format();
        return false;

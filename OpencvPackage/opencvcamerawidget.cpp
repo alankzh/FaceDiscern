@@ -1,80 +1,87 @@
-#include "camerashowwidget.h"
+#include "opencvcamerawidget.h"
 
-CameraShowWidget::CameraShowWidget(QWidget *parent):QWidget(parent){
-    init();
+OpencvCameraWidget::OpencvCameraWidget(QWidget *parent):QWidget(parent){
+    resize(width,height);
+    setFixedSize(width,height);
+    cameraViewWidget=new OpencvCameraViewWidget(this);
+    QVBoxLayout *mainLayout=new QVBoxLayout();
+    mainLayout->addWidget(cameraViewWidget);
+    this->setLayout(mainLayout);
+
+    connect(cameraViewWidget,SIGNAL(viewShowEnd()),this,SLOT(nextFrame()));//一帧显示完毕后，立即呼唤下一帧
+
+    httpUtil=new HttpUtil();
+
+    cameraThread=new CameraThreadHelper();
+
+    connect(cameraThread,SIGNAL(environmentComplete()),this,SLOT(nextFrame()));//环境初始化完毕，即开始请求下一帧
+    connect(cameraThread,SIGNAL(cameraError()),this,SLOT(cameraErrorCatch()));//摄像机错误处理
+    connect(this,SIGNAL(askCameraNextFrame()),cameraThread,SLOT(captureFrame()));//接收下一帧请求后，读取下一帧
+    connect(cameraThread,SIGNAL(sendFrame(QImage)),this,SLOT(receiveFrame(QImage)));
+    cameraThread->startThread();
+    needDiscern=false;
+    cameraErrored=false;
+
+    qDebug()<<"OpencvCameraWidget::OpencvCameraWidget";
 }
 
-CameraShowWidget::~CameraShowWidget(){
+OpencvCameraWidget::~OpencvCameraWidget(){
     if(httpUtil!=nullptr){
         delete httpUtil;
         httpUtil=nullptr;
     }
-    if(camera!=nullptr){
-        camera->deleteLater();
-        camera=nullptr;
+    if(cameraThread!=nullptr){
+        delete cameraThread;
+        cameraThread=nullptr;
+    }
+    if(cameraViewWidget!=nullptr){
+        cameraViewWidget->deleteLater();
+        cameraViewWidget=nullptr;
     }
 }
 
-void CameraShowWidget::init(){
-    resize(width,height);
-    setFixedSize(width,height);
-    noCameraInputBackgroundPix=QPixmap(width,height);
-    noCameraInputBackgroundPix.fill(QColor(56,58,76));
-
-    QVBoxLayout *mainLayout=new QVBoxLayout();
-
-    camera=new QCamera(this);
-
-    cameraImageCapture=new QCameraImageCapture(camera);
-
-    customViewFinder=new CustomCameraViewFinder(this);
-    camera->setViewfinder(customViewFinder);
-
-    camera->start();
-    camera->setCaptureMode(QCamera::CaptureStillImage);
-
-//    cameraImageCapture->setBufferFormat(QVideoFrame::Format_RGB32);
-//    cameraImageCapture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
-    //    qDebug()<< cameraImageCapture->isCaptureDestinationSupported(QCameraImageCapture :: CaptureToBuffer);
-    //    qDebug()<<cameraImageCapture->isReadyForCapture();
-    //    cameraImageCapture->capture();//先截图防卡顿  qt的摄像机截图会卡顿一下
-    connect(cameraImageCapture, SIGNAL(imageCaptured(int,QImage)), this, SLOT(receiveCapturedImage(int,QImage)));
-
-    mainLayout->addWidget(customViewFinder);
-    this->setLayout(mainLayout);
-
-    httpUtil=new HttpUtil();
-}
-
-
-void CameraShowWidget::paintEvent(QPaintEvent *event){
+void OpencvCameraWidget::paintEvent(QPaintEvent *event){
     Q_UNUSED(event);
-    if(camera->availability()!=QMultimedia::AvailabilityStatus::Available){
+    if(cameraErrored){
         QPainter painter(this);
-        painter.drawPixmap(event->rect(),noCameraInputBackgroundPix,event->rect());
+        painter.drawPixmap(event->rect(),backgroundPix,event->rect());
         painter.setPen(QColor(255,255,255));
-        QFont font;
-        font.setPixelSize(50);
         painter.drawText(QRect(400,300,840,67),QString::fromLocal8Bit("摄像头已断开，请插上后，重新打开程序"));
     }
 }
 
+//请求摄像机下一帧图片
+void OpencvCameraWidget::nextFrame(){
+    emit askCameraNextFrame();
+}
+
 /**
- * @brief CameraShowWidget::onTerranEnter
- * 人脸识别引擎检测到有人进入
- * 当terran的id为负数时，表示为游客
- * @param terran
+ * @brief OpencvCameraWidget::receiveFrame
+ * 收到摄像机中一帧图片
+ * @param image
  */
-void CameraShowWidget::onTerranEnter(QList<Terran> listFromEngine){
-//    qDebug()<<"CameraShowWidget::onTerranEnter";
+void OpencvCameraWidget::receiveFrame(QImage image){
+    cameraViewWidget->updateView(image);
+    if(needDiscern){
+        emit sendCaptureImage(image);//发送截图去识别
+        needDiscern=false;
+    }
+    update();
+}
 
+/**
+ * @brief OpencvCameraWidget::needDiscernFromCamera
+ * 需要截取一帧图片去识别
+ */
+void OpencvCameraWidget::needDiscernFromCamera(){
+    if(!needDiscern){
+        needDiscern=true;
+    }else{
+        qDebug()<<QString::fromLocal8Bit("上一帧还未完成显示");
+    }
+}
 
-    //    for(Terran terran:listFromEngine){
-    //        qDebug()<<"engine terran id:"<<terran.id<<"left:"<<terran.frFaceInput.rcFace.left<<"top:"<<terran.frFaceInput.rcFace.top<<"right:"<<terran.frFaceInput.rcFace.right<<"bottom:"<<terran.frFaceInput.rcFace.bottom;
-    //        //        qDebug()<<inCameraTerranList.size();
-    //        //        qDebug()<<listFromEngine.at(0).id;
-    //    }
-
+void OpencvCameraWidget::onTerranEnter(QList<Terran> listFromEngine){
     QList<Terran> insertList={};
     QList<Terran> deleteList={};
     QList<Terran> updateList={};
@@ -111,14 +118,14 @@ void CameraShowWidget::onTerranEnter(QList<Terran> listFromEngine){
     //删除人脸矩形
     if(deleteList.size()>0){
         for(Terran terran:deleteList){
-            customViewFinder->startDisappearAnimator(terran.id);
+            cameraViewWidget->startDisappearAnimator(terran.id);
         }
     }
 
     //人脸矩形移动
     if(updateList.size()>0){
         for(Terran terran:updateList){
-            customViewFinder->updateFaceRect(terran);
+            cameraViewWidget->updateFaceRect(terran);
         }
     }
 
@@ -126,23 +133,12 @@ void CameraShowWidget::onTerranEnter(QList<Terran> listFromEngine){
     inCameraTerranList=listFromEngine;
 }
 
-
-void CameraShowWidget::receiveCapturedImage(int, QImage image){
-//    qDebug()<<"CameraShowWidget::receiveCapturedImage";
-    emit sendCaptureImage(image);
-}
-
-void CameraShowWidget::captureImageFromCamera(){
-//    qDebug()<<"CameraShowWidget::captureImageFromCamera";
-    cameraImageCapture->capture();
-}
-
 /**
- * @brief CameraShowWidget::insertTerran
+ * @brief OpencvCameraWidget::insertTerran
  * 人脸矩形出现的处理
  * @param insertList
  */
-void CameraShowWidget::insertTerran(QList<Terran> &insertList){
+void OpencvCameraWidget::insertTerran(QList<Terran> &insertList){
     bool hasSigned=false;
     for(Terran terran:insertList){
         qDebug()<<"insert";
@@ -188,14 +184,22 @@ void CameraShowWidget::insertTerran(QList<Terran> &insertList){
             }
         }
 
-        customViewFinder->addTerranRect(terran);//出现时自动开始动画
+        cameraViewWidget->addTerranRect(terran);//出现时自动开始动画
     }
 }
 
-
-
-void CameraShowWidget::clearSignedTerranCache(){
-    qDebug()<<"CameraShowWidget::clearSignedTerranCache";
+void OpencvCameraWidget::clearSignedTerranCache(){
+    qDebug()<<"OpencvCameraWidget::clearSignedTerranCache";
     signedList.clear();
     signedList={};
+}
+
+/**
+ * @brief OpencvCameraWidget::cameraErrorCatch
+ * 当摄像机错误时
+ */
+void OpencvCameraWidget::cameraErrorCatch(){
+    backgroundPix=QPixmap(width,height);
+    backgroundPix.fill(QColor(56,58,76));
+    cameraErrored=true;
 }

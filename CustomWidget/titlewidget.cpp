@@ -82,7 +82,8 @@ void TitleWidget::setHttpAlive(bool alive){
         statuText->setText(QString::fromLocal8Bit("运行中"));
     }else{
         statuText->setFontStyle(14,QColor(255,0,0));
-        statuText->setText(QString::fromLocal8Bit("断开"));
+        statuText->setText(QString::fromLocal8Bit("断开")+QString::number(count));
+        count++;
     }
 }
 

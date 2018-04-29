@@ -26,7 +26,9 @@ HeartBeat::~HeartBeat(){
  */
 void HeartBeat::beat(){
     QNetworkRequest request;
-    request.setUrl(Constant::HEART_BEAT_URL);
+    QUrl url;
+    url.setUrl(Constant::HEART_BEAT_URL);
+    request.setUrl(url);
 
     netReply=netManager->get(request);
 //    connect(netReply, SIGNAL(readyRead()), this, SLOT(readFromResponse()));//准备读取，然后并不能读到全部数据

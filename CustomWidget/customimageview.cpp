@@ -16,11 +16,33 @@ CustomImageView::CustomImageView(QWidget *parent):QWidget(parent)
  */
 void CustomImageView::setBackground(const char *fileName, const char *flag){
     backgroundPix=QPixmap(fileName,flag);
+
     width=backgroundPix.size().width();
     height=backgroundPix.size().height();
     resize(backgroundPix.size());
     setFixedSize( width, height);
     setGeometry(xPos,yPos,width,height);
+    setMask(backgroundPix.createHeuristicMask());
+    update();
+}
+
+/**
+ * @brief CustomImageView::setScaleBackground
+ * 以固定宽高设置背景图
+ * @param width
+ * @param height
+ * @param fileName
+ * @param flag
+ */
+void CustomImageView::setScaleBackground(int width,int height,const char *fileName, const char *flag){
+    backgroundPix=QPixmap(fileName,flag).scaled(width,height,
+                                                Qt::IgnoreAspectRatio,
+                                                Qt::SmoothTransformation);
+    this->width=backgroundPix.size().width();
+    this->height=backgroundPix.size().height();
+    resize(backgroundPix.size());
+    setFixedSize( this->width, this->height);
+    setGeometry(xPos,yPos,this->width,this->height);
     setMask(backgroundPix.createHeuristicMask());
     update();
 }

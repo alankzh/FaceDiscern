@@ -15,10 +15,11 @@ CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 include(ArcFace.pri)
+#include(Opencv.pri)
+include(Opencv24.pri)
 
 TARGET = CISDIFaceDemo
 TEMPLATE = app
-
 
 SOURCES += main.cpp\
         widget.cpp \
@@ -53,7 +54,11 @@ SOURCES += main.cpp\
     CustomWidget/signgatherwidget.cpp \
     CustomWidget/signbottomwidget.cpp \
     CustomWidget/signbottomleftwidget.cpp \
-    CustomWidget/signbottomrightwidget.cpp
+    CustomWidget/signbottomrightwidget.cpp \
+    OpencvPackage/opencvcamerawidget.cpp \
+    OpencvPackage/camerathreadhelper.cpp \
+    OpencvPackage/opencvcameraviewwidget.cpp \
+    datainjectwidget.cpp
 
 HEADERS  += widget.h \
     ArcFacePackage/amcomdef.h \
@@ -99,10 +104,17 @@ HEADERS  += widget.h \
     CustomWidget/signgatherwidget.h \
     CustomWidget/signbottomwidget.h \
     CustomWidget/signbottomleftwidget.h \
-    CustomWidget/signbottomrightwidget.h
+    CustomWidget/signbottomrightwidget.h \
+    OpencvPackage/opencvcamerawidget.h \
+    OpencvPackage/camerathreadhelper.h \
+    OpencvPackage/opencvcameraviewwidget.h \
+    datainjectwidget.h
 
 
 FORMS    += widget.ui
 
 RESOURCES += \
     resources.qrc
+
+DISTFILES +=
+

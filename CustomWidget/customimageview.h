@@ -18,6 +18,9 @@ public:
     CustomImageView(QWidget *parent=nullptr);
 
     void setBackground(const char* fileName,const char* flag);
+
+    void setScaleBackground(int width,int height,const char* fileName,const char* flag);
+
     bool setPos(int x,int y);
     inline int getXpos(){
         return xPos;

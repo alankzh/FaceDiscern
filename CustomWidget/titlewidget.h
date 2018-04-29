@@ -44,6 +44,7 @@ private:
     CustomImageView *labelView;
 
     QTimer *qtimer;
+    int count=0;
 };
 
 #endif // TITLEWIDGET_H

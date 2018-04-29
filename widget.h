@@ -13,6 +13,7 @@
 #include "CustomWidget/camerashowwidget.h"
 #include "CustomWidget/signbottomwidget.h"
 #include "CustomWidget/signgatherwidget.h"
+#include "OpencvPackage/opencvcamerawidget.h"
 
 class Widget : public QWidget
 {
@@ -24,7 +25,8 @@ public:
 private slots:
 //    void captureFrameImage(int,QImage);
     void receiveAskCapture();
-    void receiveCaptureImage(QImage &image);//摄像机传回的截图
+    //FIXed  传回截图不再使用引用方式
+    void receiveCaptureImage(QImage image);//摄像机传回的截图
     void receiveDetectTerran(QList<Terran> terranList);//引擎传回的检测员工
 
     void errorDispose(QString str);
@@ -40,7 +42,8 @@ private:
 
     TitleWidget *titleWidget;
     SystemLogoWidget *systemLogoWidget;
-    CameraShowWidget *cameraShowWidget;
+//    CameraShowWidget *cameraShowWidget;
+    OpencvCameraWidget *opencvCameraWidget;
     SignBottomWidget *signNumWidget;
     SignGatherWidget *signMessageWidget;
 

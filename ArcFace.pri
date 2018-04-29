@@ -7,3 +7,5 @@ LIBS+=$$PWD/ArcFaceLibrary/opencv_core2413.lib
 LIBS+=$$PWD/ArcFaceLibrary/opencv_highgui2413.lib
 LIBS+=$$PWD/ArcFaceLibrary/USER32.LIB
 
+DISTFILES +=
+

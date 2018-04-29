@@ -1,0 +1,40 @@
+INCLUDEPATH += E:\OpencvCompile\debug\include
+INCLUDEPATH += E:\OpencvCompile\debug\include\opencv
+INCLUDEPATH += E:\OpencvCompile\debug\include\opencv2
+CONFIG(debug, debug|release): {
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_calib3d340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_core340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_dnn340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_features2d340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_flann340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_highgui340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_imgcodecs340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_imgproc340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_ml340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_objdetect340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_photo340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_shape340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_stitching340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_superres340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_video340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_videoio340d.lib
+LIBS +=E:\OpencvCompile\debug\x64\vc12\lib\opencv_videostab340d.lib
+} else:CONFIG(release, debug|release): {
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_calib3d340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_core340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_dnn340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_features2d340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_flann340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_highgui340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_imgcodecs340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_imgproc340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_ml340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_objdetect340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_photo340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_shape340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_stitching340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_superres340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_video340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_videoio340.lib
+LIBS +=E:\OpencvCompile\release\x64\vc12\lib\opencv_videostab340.lib
+}

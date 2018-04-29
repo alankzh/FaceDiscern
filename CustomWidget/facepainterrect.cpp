@@ -6,7 +6,7 @@ FacePainterRect::FacePainterRect(QWidget *parent):QWidget(parent)
     //    fontColor=QColor(255,255,255);//默认为白色
 
     rectColor=QColor(255,255,255);//默认为白色
-//    fontColor=QColor(71,144,181);//默认为蓝色
+    //    fontColor=QColor(71,144,181);//默认为蓝色
     fontColor=QColor(23,213,230);//亮蓝色
     int width=0;
     int height=0;
@@ -98,41 +98,41 @@ void FacePainterRect::animatorStatusChange(){
             needShowFontSize=terran.name.size()+terran.department.size()+5;//hh:mm 的时间表示方式，时间长度为5
             if(appearFontCount>=needShowFontSize){
                 //                fontColor=QColor(255,255,255);
-//                fontColor=QColor(71,144,181);
+                //                fontColor=QColor(71,144,181);
                 fontColor=QColor(23,213,230);
                 emit askUpdateUI();
                 animatorStatus=FaceAnimatorStatus::Appeared;
             }else{
                 if(appearFontCount==0){
                     //                    fontColor=QColor(255,255,255,0);
-//                    fontColor=QColor(71,144,181,0);
+                    //                    fontColor=QColor(71,144,181,0);
                     fontColor=QColor(23,213,230,0);
                 }else if(appearFontCount==1){
                     //                    fontColor=QColor(255,255,255,153);
-//                    fontColor=QColor(71,144,181,153);
+                    //                    fontColor=QColor(71,144,181,153);
                     fontColor=QColor(23,213,230,153);
                 }else if(appearFontCount==2){
                     //                    fontColor=QColor(255,255,255,51);
-//                    fontColor=QColor(71,144,181,51);
+                    //                    fontColor=QColor(71,144,181,51);
 
                     fontColor=QColor(23,213,230,51);
                 }else if(appearFontCount==3){
                     //                    fontColor=QColor(255,255,255,204);
-//                    fontColor=QColor(71,144,181,204);
+                    //                    fontColor=QColor(71,144,181,204);
 
                     fontColor=QColor(23,213,230,204);
                 }else if(appearFontCount==4){
                     //                    fontColor=QColor(255,255,255,102);
-//                    fontColor=QColor(71,144,181,102);
+                    //                    fontColor=QColor(71,144,181,102);
 
                     fontColor=QColor(23,213,230,102);
                 }else if(appearFontCount==5){
-//                    fontColor=QColor(255,255,255);
-//                    fontColor=QColor(71,144,181);
+                    //                    fontColor=QColor(255,255,255);
+                    //                    fontColor=QColor(71,144,181);
                     fontColor=QColor(23,213,230);
                 }else{
-//                    fontColor=QColor(255,255,255);
-//                    fontColor=QColor(71,144,181);
+                    //                    fontColor=QColor(255,255,255);
+                    //                    fontColor=QColor(71,144,181);
 
                     fontColor=QColor(23,213,230);
                 }
@@ -146,48 +146,48 @@ void FacePainterRect::animatorStatusChange(){
         qtimer->stop();
         break;
     case FaceAnimatorStatus::DisApearedAnimatorStep1:
-//        rectColor=QColor(71,144,181,255);//透明度为1
-//        fontColor=QColor(255,255,255);
-       fontColor=QColor(71,144,181,255);//透明度为1
+        //        rectColor=QColor(71,144,181,255);//透明度为1
+        //        fontColor=QColor(255,255,255);
+        fontColor=QColor(71,144,181,255);//透明度为1
         rectColor=QColor(255,255,255);
         emit askUpdateUI();
         animatorStatus=FaceAnimatorStatus::DisApearedAnimatorStep2;
         break;
     case FaceAnimatorStatus::DisApearedAnimatorStep2:
-//        rectColor=QColor(71,144,181,102);//透明度为0.4
-//        fontColor=QColor(255,255,255,102);
+        //        rectColor=QColor(71,144,181,102);//透明度为0.4
+        //        fontColor=QColor(255,255,255,102);
         fontColor=QColor(71,144,181,102);//透明度为0.4
         rectColor=QColor(255,255,255,102);
         emit askUpdateUI();
         animatorStatus=FaceAnimatorStatus::DisApearedAnimatorStep3;
         break;
     case FaceAnimatorStatus::DisApearedAnimatorStep3:
-//        rectColor=QColor(71,144,181,204);//透明度为0.8
-//        fontColor=QColor(255,255,255,204);
+        //        rectColor=QColor(71,144,181,204);//透明度为0.8
+        //        fontColor=QColor(255,255,255,204);
         fontColor=QColor(71,144,181,204);//透明度为0.8
         rectColor=QColor(255,255,255,204);
         emit askUpdateUI();
         animatorStatus=FaceAnimatorStatus::DisApearedAnimatorStep4;
         break;
     case FaceAnimatorStatus::DisApearedAnimatorStep4:
-//        rectColor=QColor(71,144,181,51);//透明度为0.2
-//        fontColor=QColor(255,255,255,51);
+        //        rectColor=QColor(71,144,181,51);//透明度为0.2
+        //        fontColor=QColor(255,255,255,51);
         fontColor=QColor(71,144,181,51);//透明度为0.2
         rectColor=QColor(255,255,255,51);
         emit askUpdateUI();
         animatorStatus=FaceAnimatorStatus::DisApearedAnimatorStep5;
         break;
     case FaceAnimatorStatus::DisApearedAnimatorStep5:
-//        rectColor=QColor(71,144,181,153);//透明度为0.6
-//        fontColor=QColor(255,255,255,153);
+        //        rectColor=QColor(71,144,181,153);//透明度为0.6
+        //        fontColor=QColor(255,255,255,153);
         fontColor=QColor(71,144,181,153);//透明度为0.6
         rectColor=QColor(255,255,255,153);
         emit askUpdateUI();
         animatorStatus=FaceAnimatorStatus::DisApearedAnimatorStep6;
         break;
     case FaceAnimatorStatus::DisApearedAnimatorStep6:
-//        rectColor=QColor(71,144,181,0);//透明度为0
-//        fontColor=QColor(255,255,255,0);
+        //        rectColor=QColor(71,144,181,0);//透明度为0
+        //        fontColor=QColor(255,255,255,0);
         fontColor=QColor(71,144,181,0);//透明度为0
         rectColor=QColor(255,255,255,0);
         emit askUpdateUI();
@@ -235,30 +235,37 @@ void FacePainterRect::startDisappearAnimator(){
 void FacePainterRect::setTerran(Terran terran){
     this->terran=terran;
 
-    this->left=terran.frFaceInput.rcFace.left;
-    this->top=terran.frFaceInput.rcFace.top;
-    this->right=terran.frFaceInput.rcFace.right;
-    this->bottom=terran.frFaceInput.rcFace.bottom;
+    this->left=terran.frFaceInput.rcFace.left*1.8;
+    this->top=terran.frFaceInput.rcFace.top*1.8;
+    this->right=terran.frFaceInput.rcFace.right*1.8;
+    this->bottom=terran.frFaceInput.rcFace.bottom*1.8;
 
-    //    int rectWidth=terran.frFaceInput.rcFace.right-terran.frFaceInput.rcFace.left;
-    //    int rectHeight=terran.frFaceInput.rcFace.bottom-terran.frFaceInput.rcFace.top;
+    //保证矩形框为正方形,并且比默认的边大其0.25倍,丽桃说正方形才好看！
+    int rectWidth=(right-left)*1.25;
+    int rectHeight=(bottom-top)*1.25;
 
-    //    //保证矩形框为正方形,并且比默认的边大其0.25倍,丽桃说正方形才好看！
-    //    if(rectWidth>=rectHeight){
-    //        int widthZoomSize=rectWidth*0.125;
-    //        this->left=terran.frFaceInput.rcFace.left-widthZoomSize;
-    //        this->right=terran.frFaceInput.rcFace.right+widthZoomSize;
+    //保证矩形框最短边长为80
+    if(rectWidth<=150&&rectHeight<=150){
+        rectWidth=150;
+    }
 
-    //        this->top=terran.frFaceInput.rcFace.top-((rectWidth-rectHeight)*0.5)-widthZoomSize;
-    //        this->bottom=terran.frFaceInput.rcFace.bottom+((rectWidth-rectHeight)*0.5)+widthZoomSize;
-    //    }else{
-    //        int heightZoomSize=rectHeight*0.125;
-    //        this->top=terran.frFaceInput.rcFace.top-heightZoomSize;
-    //        this->bottom=terran.frFaceInput.rcFace.bottom+heightZoomSize;
+    int midX=(right+left)*0.5;//中心点x坐标
+    int midY=(bottom+top)*0.5;//中心点y坐标
+    if(rectWidth>=rectHeight){
+        int halfRectLength=(rectWidth*0.5);
 
-    //        this->left=terran.frFaceInput.rcFace.left-((rectHeight-rectWidth)*0.5)-heightZoomSize;
-    //        this->right=terran.frFaceInput.rcFace.right+((rectHeight-rectWidth)*0.5)+heightZoomSize;
-    //    }
+        this->left=midX-halfRectLength;
+        this->right=midX+halfRectLength;
+        this->top=midY-halfRectLength;
+        this->bottom=midY+halfRectLength;
+    }else{
+        int halfRectLength=(rectHeight*0.5);
+
+        this->left=midX-halfRectLength;
+        this->right=midX+halfRectLength;
+        this->top=midY-halfRectLength;
+        this->bottom=midY+halfRectLength;
+    }
 
     sizeAdapter();
     emit askUpdateUI();

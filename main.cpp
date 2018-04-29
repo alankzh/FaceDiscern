@@ -16,8 +16,7 @@
 #include "CustomWidget/signinwidget.h"
 #include "CustomWidget/signgatherwidget.h"
 #include "CustomWidget/signbottomwidget.h"
-
-//#include <vld.h>
+#include "datainjectwidget.h"
 
 int main(int argc, char *argv[])
 {
@@ -29,14 +28,8 @@ int main(int argc, char *argv[])
 
     Constant::Read_Configuration();
 
-
-    Widget w;//主界面
-    w.show();
-
-//    Widget *w=new Widget();
-//    w->show();
-
-
+    Widget *w=new Widget();//主界面
+    w->show();
 
     //    DBCTestWidget dbTest;// 数据库测试
     //    dbTest.show();
@@ -44,5 +37,7 @@ int main(int argc, char *argv[])
 //        FaceDiscernTestWidget faceDiscernWidget; //人脸对比测试
 //        faceDiscernWidget.show();
 
+//    DataInjectWidget *dataInject=new DataInjectWidget();
+//    dataInject->show();
     return a.exec();
 }

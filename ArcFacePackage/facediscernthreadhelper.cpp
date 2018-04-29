@@ -58,17 +58,19 @@ void FaceDiscernThreadHelper::environmentInit(){
  * @param image
  */
 void FaceDiscernThreadHelper::receiveCaptureImage(QImage &image){
-    QImage scaledImage = image.scaled(QSize(1140,845),
-                                      Qt::KeepAspectRatio,
-                                      Qt::SmoothTransformation);
+    /*使用opencvCamera不需要缩放图片，qtCamera需要*/
+//    QImage scaledImage = image.scaled(QSize(1140,845),
+//                                      Qt::KeepAspectRatio,
+//                                      Qt::SmoothTransformation);
     //  TODO  scaledImage.save("E:\\sava.jpg");
     //    qDebug()<<scaledImage.size();
     int errorCode=0;
-    LPAFT_FSDK_FACERES ftFaceRes=faceDiscern->FTEngineDiscern(scaledImage,errorCode);
+    LPAFT_FSDK_FACERES ftFaceRes=faceDiscern->FTEngineDiscern(image,errorCode);
     if(errorCode!=MOK){
         errorCatch(errorCode,FaceDiscern::FailedType::FaceTrackingFailed);
     }else{
 
+        /*只追踪，不识别*/
 //        int faceNum=ftFaceRes->nFace;
 //        QList<Terran> terranList={};
 //        for(int i=0;i<faceNum;i++){
@@ -88,19 +90,19 @@ void FaceDiscernThreadHelper::receiveCaptureImage(QImage &image){
                 for(int i=0;i<faceNum;i++){
                     TerranFaceFeature terranFaceFeature;
                     AFR_FSDK_FACEINPUT frInput=faceDiscern->getFREngineFaceInput(ftFaceRes,i);
-                    terranFaceFeature.frFaceModelFeature=faceDiscern->FREngineExtractFaceFeature(scaledImage,frInput,errorCode);
+                    terranFaceFeature.frFaceModelFeature=faceDiscern->FREngineExtractFaceFeature(image,frInput,errorCode);
                     bool isEmployee=false;
-                    for(TerranFaceFeature cacheTerranFaceFeature:featureList){
+                    for(int cacheIndex=0;cacheIndex<featureList.size();cacheIndex++){
                         float similarity=0.0;
-                        similarity=faceDiscern->FREngineCompareFaceFeature(&(cacheTerranFaceFeature.frFaceModelFeature),&(terranFaceFeature.frFaceModelFeature),errorCode);
+                        similarity=faceDiscern->FREngineCompareFaceFeature(&(featureList[cacheIndex].frFaceModelFeature),&(terranFaceFeature.frFaceModelFeature),errorCode);
                         if(errorCode!=MOK){
                             errorCatch(errorCode,FaceDiscern::FailedType::FacePairMatchFailed);
                         }else{
-                            if(similarity>=0.6){
+                            if(similarity>=0.65){
                                 //是员工
         //                        qDebug()<<"is Employ";
                                 Terran terran;
-                                terran.id=cacheTerranFaceFeature.id;
+                                terran.id=featureList.at(cacheIndex).id;
                                 QList<Terran> list={};
                                 list.append(terran);
                                 SQLDataBase::instance()->operationDB(FACE_DB_CONNECTION_NAME,SQLDataBase::OperationWay::SelectDBWithId,list);
@@ -110,7 +112,7 @@ void FaceDiscernThreadHelper::receiveCaptureImage(QImage &image){
                                 isEmployee=true;
 
                                 if(Constant::SAVE_DISCERN){
-                                    QImage faceImg=scaledImage.copy(ftFaceRes->rcFace[i].left,ftFaceRes->rcFace[i].top,ftFaceRes->rcFace[i].right-ftFaceRes->rcFace[i].left,ftFaceRes->rcFace[i].bottom-ftFaceRes->rcFace[i].top);
+                                    QImage faceImg=image.copy(ftFaceRes->rcFace[i].left,ftFaceRes->rcFace[i].top,ftFaceRes->rcFace[i].right-ftFaceRes->rcFace[i].left,ftFaceRes->rcFace[i].bottom-ftFaceRes->rcFace[i].top);
                                     faceImg.save(DIRPATH_DISCERN_TERRAN+terran2.name+QString::fromLocal8Bit(".jpg"),"JPG");
         //                            qDebug()<<DIRPATH_DISCERN_TERRAN+terran2.name+QString::fromLocal8Bit(".jpg");
                                 }

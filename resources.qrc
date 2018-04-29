@@ -7,5 +7,6 @@
         <file>ResourcesPackage/faceIsVisitor.png</file>
         <file>ResourcesPackage/runningLabel.png</file>
         <file>ResourcesPackage/background.jpg</file>
+        <file>ResourcesPackage/LOGO.png</file>
     </qresource>
 </RCC>

@@ -23,6 +23,17 @@ TerranFaceFeature::TerranFaceFeature(const TerranFaceFeature &terranFaceFeature)
     memcpy(frFaceModelFeature.pbFeature, terranFaceFeature.frFaceModelFeature.pbFeature, frFaceModelFeature.lFeatureSize);
 }
 
+TerranFaceFeature& TerranFaceFeature::operator=(const TerranFaceFeature &terranFaceFeature){
+    id=terranFaceFeature.id;
+    qDebug()<<"TerranFaceFeature::operator=";
+    /* 拷贝人脸特征结果,以防下一次提取后，引擎中内容改变*/
+    frFaceModelFeature.lFeatureSize = terranFaceFeature.frFaceModelFeature.lFeatureSize;
+    frFaceModelFeature.pbFeature = (MByte*)malloc(terranFaceFeature.frFaceModelFeature.lFeatureSize);
+    memcpy(frFaceModelFeature.pbFeature, terranFaceFeature.frFaceModelFeature.pbFeature, frFaceModelFeature.lFeatureSize);
+
+    return *this;
+}
+
 
 /**
  * @brief TerranFaceFeature::copyInjectFaceFeature

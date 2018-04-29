@@ -20,11 +20,12 @@ void SystemLogoWidget::init(){
 
     CIDILogo=new CustomImageView(this);
     CIDILogo->setPos(0,0);
-    CIDILogo->setBackground(":/ResourcesPackage/CISDILogo.png","png");
+    CIDILogo->setScaleBackground(144,100,":/ResourcesPackage/CISDILogo.png","png");
+//    CIDILogo->setBackground(":/ResourcesPackage/CISDILogo.png","png");
 
     systemName=new CustomTextView(this);
     systemName->setFontStyle(36);
-    systemName->setText(QString::fromLocal8Bit("人脸识别签到系统"));
+    systemName->setText(QString::fromLocal8Bit("人脸识别考勤系统"));
 
     QDateTime dateTime =QDateTime::currentDateTime();
     QString currentDate =dateTime.toString(QString::fromLocal8Bit("yyyy年MM月dd日"));
@@ -70,23 +71,30 @@ void SystemLogoWidget::paintEvent(QPaintEvent *event){
 
 //更新时间
 void SystemLogoWidget::updateTime(){
+    qDebug()<<"SystemLogoWidget::updateTime";
     timeMsec+=5000;
     if(timeMsec>=CLEAR_SIGN_CACHE_INTERVAL){
         emit clearTerranSignCache();//通知清空缓存
         timeMsec=0;
     }
+
     QTime currentQtime=QTime::currentTime();
     int nowMsec=currentQtime.msecsSinceStartOfDay();
     if(nowMsec<=5000){
         emit clearTerranSignNum();//每日0点，清空签到人数
 
-        system("shutdown -r -t 0");//重启
-
         /*清空是否第一次签到*/
         QList<Terran> list={};
         SQLDataBase::instance()->operationDB(UI_DB_CONNECTION_NAME,SQLDataBase::OperationWay::ClearSignType,list);
+    }
 
-        system("shutdown -r -t 0");//重启
+    QTime restartTime(3,0,0);
+    int msecToRestart=currentQtime.msecsTo(restartTime);
+    if(msecToRestart>=-5000&&msecToRestart<0){
+        /*凌晨3点重启应用程序*/
+        qApp->quit();
+        QProcess::startDetached(qApp->applicationFilePath(), QStringList(qApp->applicationFilePath()));
+//        system("shutdown -r -t 0");//重启电脑
     }
 
     QDateTime dateTime =QDateTime::currentDateTime();

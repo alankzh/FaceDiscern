@@ -37,7 +37,7 @@ public slots:
 
     void clearSignedTerranCache();
 signals:
-    void sendCaptureImage(QImage &image);
+    void sendCaptureImage(QImage image);
 
     void newTerranSign(Terran terran);
 protected:

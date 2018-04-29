@@ -18,6 +18,8 @@ public:
     TerranFaceFeature();
     ~TerranFaceFeature();
     TerranFaceFeature(const TerranFaceFeature &terranFaceFeature);
+    TerranFaceFeature& operator=(const TerranFaceFeature &terranFaceFeature);
+
     void copyInjectFaceFeature(AFR_FSDK_FACEMODEL enginesFaceModelFeature);
 
     int id=0;
