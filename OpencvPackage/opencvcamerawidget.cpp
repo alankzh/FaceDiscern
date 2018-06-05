@@ -61,6 +61,10 @@ void OpencvCameraWidget::nextFrame(){
  * @param image
  */
 void OpencvCameraWidget::receiveFrame(QImage image){
+    if(image.byteCount()<=0){
+        nextFrame();//截图为空，直接呼唤下一帧
+        return;
+    }
     cameraViewWidget->updateView(image);
     if(needDiscern){
         emit sendCaptureImage(image);//发送截图去识别
@@ -202,4 +206,8 @@ void OpencvCameraWidget::cameraErrorCatch(){
     backgroundPix=QPixmap(width,height);
     backgroundPix.fill(QColor(56,58,76));
     cameraErrored=true;
+}
+
+void OpencvCameraWidget::closeOpencvCamera(){
+    cameraThread->closeCamera();
 }

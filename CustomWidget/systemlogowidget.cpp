@@ -20,8 +20,8 @@ void SystemLogoWidget::init(){
 
     CIDILogo=new CustomImageView(this);
     CIDILogo->setPos(0,0);
-    CIDILogo->setScaleBackground(144,100,":/ResourcesPackage/CISDILogo.png","png");
-//    CIDILogo->setBackground(":/ResourcesPackage/CISDILogo.png","png");
+//    CIDILogo->setScaleBackground(144,100,":/ResourcesPackage/LOGO.png","png");
+    CIDILogo->setBackground(":/ResourcesPackage/CISDILogo.png","png");
 
     systemName=new CustomTextView(this);
     systemName->setFontStyle(36);
@@ -56,6 +56,13 @@ void SystemLogoWidget::init(){
 
     this->setLayout(mainLayout);
 
+    restartTime=QTime(3,0,0);
+    restartTime1=QTime(1,0,0);
+    restartTime2=QTime(6,0,0);
+    restartTime3=QTime(10,30,0);
+    restartTime4=QTime(15,0,0);
+    restartTime5=QTime(19,30,0);
+
     qtimer=new QTimer(this);
     qtimer->setInterval(5000);//5s钟更新一次时间
     connect(qtimer,SIGNAL(timeout()),this,SLOT(updateTime()));
@@ -88,13 +95,42 @@ void SystemLogoWidget::updateTime(){
         SQLDataBase::instance()->operationDB(UI_DB_CONNECTION_NAME,SQLDataBase::OperationWay::ClearSignType,list);
     }
 
-    QTime restartTime(3,0,0);
+
     int msecToRestart=currentQtime.msecsTo(restartTime);
     if(msecToRestart>=-5000&&msecToRestart<0){
-        /*凌晨3点重启应用程序*/
-        qApp->quit();
-        QProcess::startDetached(qApp->applicationFilePath(), QStringList(qApp->applicationFilePath()));
-//        system("shutdown -r -t 0");//重启电脑
+        /*凌晨3点重启电脑*/
+//        emit restartApplication();
+        ApplicationUtil::restartSystem();//重启电脑
+    }
+
+    int msecToRestart1=currentQtime.msecsTo(restartTime1);
+    if(msecToRestart1>=-5000&&msecToRestart1<0){
+        /*凌晨1点重启应用程序*/
+        emit restartApplication();
+    }
+
+    int msecToRestart2=currentQtime.msecsTo(restartTime2);
+    if(msecToRestart2>=-5000&&msecToRestart2<0){
+        /*早晨6点重启应用程序*/
+        emit restartApplication();
+    }
+
+    int msecToRestart3=currentQtime.msecsTo(restartTime3);
+    if(msecToRestart3>=-5000&&msecToRestart3<0){
+        /*上午10点半重启应用程序*/
+        emit restartApplication();
+    }
+
+    int msecToRestart4=currentQtime.msecsTo(restartTime4);
+    if(msecToRestart4>=-5000&&msecToRestart4<0){
+        /*下午3点重启应用程序*/
+        emit restartApplication();
+    }
+
+    int msecToRestart5=currentQtime.msecsTo(restartTime5);
+    if(msecToRestart5>=-5000&&msecToRestart5<0){
+        /*下午7点半重启应用程序*/
+        emit restartApplication();
     }
 
     QDateTime dateTime =QDateTime::currentDateTime();

@@ -17,6 +17,7 @@
 #include "CustomWidget/signgatherwidget.h"
 #include "CustomWidget/signbottomwidget.h"
 #include "datainjectwidget.h"
+#include "CustomWidget/popwidget.h"
 
 int main(int argc, char *argv[])
 {
@@ -31,6 +32,8 @@ int main(int argc, char *argv[])
     Widget *w=new Widget();//主界面
     w->show();
 
+//    PopWidget *pop=new PopWidget();
+//    pop->show();
     //    DBCTestWidget dbTest;// 数据库测试
     //    dbTest.show();
 

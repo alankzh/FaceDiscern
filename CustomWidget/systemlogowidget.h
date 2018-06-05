@@ -8,6 +8,7 @@
 #include "CustomWidget/customtextview.h"
 #include <QTimer>
 #include "DBC/sqldatabase.h"
+#include "applicationutil.h"
 
 /**
  * @brief The SystemLogoWidget class
@@ -25,6 +26,7 @@ public:
 signals:
     void clearTerranSignCache();//通知清空缓存
     void clearTerranSignNum();//通知清空签到人数
+    void restartApplication();//通知重启应用
 protected:
     virtual void paintEvent(QPaintEvent *event);
 private:
@@ -36,6 +38,13 @@ private:
     CustomTextView *calendarText;
     QTimer *qtimer;
     int timeMsec;
+
+    QTime restartTime;
+    QTime restartTime1;
+    QTime restartTime2;
+    QTime restartTime3;
+    QTime restartTime4;
+    QTime restartTime5;
 private slots:
     void updateTime();
 };

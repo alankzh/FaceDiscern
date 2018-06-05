@@ -14,6 +14,7 @@
 #include "CustomWidget/signbottomwidget.h"
 #include "CustomWidget/signgatherwidget.h"
 #include "OpencvPackage/opencvcamerawidget.h"
+#include "CustomWidget/popwidget.h"
 
 class Widget : public QWidget
 {
@@ -32,6 +33,9 @@ private slots:
     void errorDispose(QString str);
 
     void quitApplication(bool);
+
+    void showHintWindow();//提示弹窗
+    void closeHintWindow();//关闭提示弹窗
 signals:
     void sendImageToFaceEngine(QImage &image);//发送截图到人脸识别引擎
 protected:
@@ -46,6 +50,9 @@ private:
     OpencvCameraWidget *opencvCameraWidget;
     SignBottomWidget *signNumWidget;
     SignGatherWidget *signMessageWidget;
+
+    PopWidget *popWidget;
+    bool isNeedPop=false;
 
     FaceDiscernThreadHelper *faceDiscernThreadHelper;
     HeartThreadHelper *heartBeatThreadHelper;

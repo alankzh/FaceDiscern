@@ -70,16 +70,21 @@ void Widget::init(){
     connect(opencvCameraWidget,SIGNAL(newTerranSign(Terran)),signMessageWidget,SLOT(signIn(Terran)));//新员工签到
     connect(opencvCameraWidget,SIGNAL(newTerranSign(Terran)),signNumWidget,SLOT(signIn(Terran)));//新员工签到，已签到人数+1
     connect(systemLogoWidget,SIGNAL(clearTerranSignCache()),opencvCameraWidget,SLOT(clearSignedTerranCache()));//清空已签到缓存
-
+    connect(systemLogoWidget,SIGNAL(restartApplication()),opencvCameraWidget,SLOT(closeOpencvCamera()));//关闭摄像机
     connect(systemLogoWidget,SIGNAL(clearTerranSignNum()),signNumWidget,SLOT(clearSignedTerranNum()));//清空签到人数
 
     this->setLayout(mainLayout);
+
+    popWidget=new PopWidget(this);
+    popWidget->setGeometry(690,500,550,85);
 
     faceDiscernThreadHelper=new FaceDiscernThreadHelper();
     connect(faceDiscernThreadHelper,SIGNAL(askCapture()),this,SLOT(receiveAskCapture()));//引擎请求截图信号askCapture() ->> 接收到请求截图receiveAskCapture()
     connect(this,SIGNAL(sendImageToFaceEngine(QImage&)),faceDiscernThreadHelper,SLOT(receiveCaptureImage(QImage&)));
     connect(faceDiscernThreadHelper,SIGNAL(error(QString)),this,SLOT(errorDispose(QString)));
     connect(faceDiscernThreadHelper,SIGNAL(sendTerran(QList<Terran>)),this,SLOT(receiveDetectTerran(QList<Terran>)));
+    connect(faceDiscernThreadHelper,SIGNAL(loadDate()),this,SLOT(showHintWindow()));//加载数据时弹出提示窗口
+    connect(faceDiscernThreadHelper,SIGNAL(loadDateDown()),this,SLOT(closeHintWindow()));//加载完毕数据时关闭提示窗口
 
     qDebug()<<QString::fromLocal8Bit("当前线程id")<<(int)QThread::currentThreadId();
 
@@ -101,6 +106,10 @@ void Widget::quitApplication(bool){
 
 void Widget::paintEvent(QPaintEvent *event){
     Q_UNUSED(event);
+
+    if(isNeedPop){
+        popWidget->showWindow();
+    }
     //    QPainter painter(this);
     //    painter.drawPixmap(event->rect(), backgroundPix, event->rect());
 
@@ -137,4 +146,12 @@ void Widget::errorDispose(QString str){
     QCoreApplication::instance()->quit();
 }
 
+void Widget::showHintWindow(){
+    isNeedPop=true;
+}
+
+void Widget::closeHintWindow(){
+    isNeedPop=false;
+    popWidget->hideWindow();
+}
 

@@ -8,5 +8,6 @@
         <file>ResourcesPackage/runningLabel.png</file>
         <file>ResourcesPackage/background.jpg</file>
         <file>ResourcesPackage/LOGO.png</file>
+        <file>ResourcesPackage/dataLoading.png</file>
     </qresource>
 </RCC>

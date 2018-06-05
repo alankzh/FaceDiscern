@@ -8,6 +8,7 @@ CameraThreadHelper::CameraThreadHelper(QObject *parent):QObject(parent){
 CameraThreadHelper::~CameraThreadHelper(){
     emit endThread();
     if(cap.isOpened()){
+        qDebug()<<"capture is release";
         cap.release();
     }
 }
@@ -28,11 +29,27 @@ void CameraThreadHelper::startThread(){
 void CameraThreadHelper::environmentInit(){
     qDebug()<<"CameraThreadHelper::environmentInit";
     cap.open(0);
-    if (!cap.isOpened()) //if not successful then exit
+
+    while(!cap.isOpened()) //if not successful then exit
     {
         qDebug() << "Cannot open webcam";
         emit cameraError();//没有摄像头
-        return;
+        QEventLoop loop;
+        QTimer timer;
+
+        QObject::connect(&timer,SIGNAL(timeout()),&loop,SLOT(quit()));
+        timer.start(5000);
+        loop.exec();//事件循环阻塞，除非loop的quit()被调用，否则.exec()以后的代码将不被调用
+
+        //实测发现，超时未超时，timer都是active的
+        if (timer.isActive()){
+            //未超时  实测会始终走这条逻辑线
+            timer.stop();
+            cap.open(0);
+        } else {
+            //超时
+            cap.open(0);
+        }
     }
     /*分辨率*/
     //    cap.set(CV_CAP_PROP_FRAME_WIDTH, 1280);
@@ -67,29 +84,47 @@ void CameraThreadHelper::captureFrame(){
  * @param mtx
  * @return
  */
-QImage CameraThreadHelper::MatToQImage(cv::Mat dst){
+QImage CameraThreadHelper::MatToQImage(cv::Mat &dst){
     Mat mtx;//参考系
     flip(dst, mtx,1);//1 水平反转 （左右）
     switch (mtx.type()){
     case CV_8UC1:{
         QImage img((const unsigned char *)(mtx.data), mtx.cols, mtx.rows, mtx.cols, QImage::Format_Grayscale8);
+        dst.release();
+//        mtx.release();
         return img;
     }
         break;
     case CV_8UC3:{
         QImage img((const unsigned char *)(mtx.data), mtx.cols, mtx.rows, mtx.cols * 3, QImage::Format_RGB888);
+        dst.release();
+//        mtx.release();
         return img.rgbSwapped();
     }
         break;
     case CV_8UC4:{
         QImage img((const unsigned char *)(mtx.data), mtx.cols, mtx.rows, mtx.cols * 4, QImage::Format_ARGB32);
+        dst.release();
+//        mtx.release();
         return img;
     }
         break;
     default:{
         QImage img;
+        dst.release();
+        closeCamera();//Mat未能转换为QImage，重启应用
+//        mtx.release();
         return img;
     }
         break;
     }
+}
+
+void CameraThreadHelper::closeCamera(){
+    qDebug()<<"CameraThreadHelper::closeCamera";
+    if(cap.isOpened()){
+        cap.release();
+    }
+    emit endThread();
+    ApplicationUtil::restartApplication();//重启
 }

@@ -30,6 +30,9 @@ signals:
     void sendTerran(QList<Terran> terranlist);//发送检测到的人
 
     void error(QString errorHint);//发送错误提示，使用这个信号表示错误严重到必须退出程序
+
+    void loadDate();
+    void loadDateDown();
 public slots:
     void receiveCaptureImage(QImage &image);
 

@@ -58,7 +58,9 @@ SOURCES += main.cpp\
     OpencvPackage/opencvcamerawidget.cpp \
     OpencvPackage/camerathreadhelper.cpp \
     OpencvPackage/opencvcameraviewwidget.cpp \
-    datainjectwidget.cpp
+    datainjectwidget.cpp \
+    applicationutil.cpp \
+    CustomWidget/popwidget.cpp
 
 HEADERS  += widget.h \
     ArcFacePackage/amcomdef.h \
@@ -108,7 +110,9 @@ HEADERS  += widget.h \
     OpencvPackage/opencvcamerawidget.h \
     OpencvPackage/camerathreadhelper.h \
     OpencvPackage/opencvcameraviewwidget.h \
-    datainjectwidget.h
+    datainjectwidget.h \
+    applicationutil.h \
+    CustomWidget/popwidget.h
 
 
 FORMS    += widget.ui

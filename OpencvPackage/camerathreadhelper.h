@@ -7,7 +7,7 @@
 #include <opencv2/core/core.hpp>
 #include <imgproc/imgproc.hpp>
 #include "cxcore.h"
-
+#include "applicationutil.h"
 
 class CameraThreadHelper:public QObject
 {
@@ -16,6 +16,7 @@ public:
     CameraThreadHelper(QObject *parent=nullptr);
     ~CameraThreadHelper();
     void startThread();
+    void closeCamera();//¹Ø±ÕÉãÏñ»ú
 public slots:
     void captureFrame();
 signals:
@@ -28,7 +29,7 @@ signals:
 private slots:
     void environmentInit();
 private:
-    QImage MatToQImage(cv::Mat mtx);
+    QImage MatToQImage(cv::Mat &mtx);
     cv::VideoCapture cap;
     cv::Mat frame;
 

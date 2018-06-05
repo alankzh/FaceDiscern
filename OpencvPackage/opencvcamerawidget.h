@@ -10,6 +10,7 @@
 #include "DBC/sqldatabase.h"
 #include "constant.h"
 #include "opencvcameraviewwidget.h"
+#include "applicationutil.h"
 
 class OpencvCameraWidget:public QWidget
 {
@@ -25,6 +26,7 @@ public slots:
     void onTerranEnter(QList<Terran> listFromEngine);
     void receiveFrame(QImage image);
     void clearSignedTerranCache();
+    void closeOpencvCamera();
 signals:
     void askCameraNextFrame();//向相机线程请求下一帧
     void sendCaptureImage(QImage image);

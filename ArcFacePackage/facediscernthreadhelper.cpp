@@ -191,6 +191,7 @@ void FaceDiscernThreadHelper::receiveCaptureImage(QImage &image){
  * @param terranList
  */
 void FaceDiscernThreadHelper::loadPicFeatureFromDb(QList<Terran> &terranList){
+    emit loadDate();//¿ªÊ¼¼ÓÔØÍ¼Æ¬
     QMutableListIterator<Terran> iter(terranList);
     while(iter.hasNext()){
         QList<Terran> loadList={};
@@ -222,7 +223,7 @@ void FaceDiscernThreadHelper::loadPicFeatureFromDb(QList<Terran> &terranList){
             qDebug()<<QString::fromLocal8Bit("¼ÓÔØÊ§°Ü£¬°¢ÃÖÍÓ·ð£¬ËæÔµ°É£¬¼ÌÐøÏÂÔØÏÂÒ»ÕÅÍ¼Æ¬»º´æ");
         }
     }
-    qDebug()<<featureList.size();
+    emit loadDateDown();//¼ÓÔØÍ¼Æ¬Íê³É
 }
 
 
